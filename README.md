@@ -4,7 +4,7 @@ This mod creates a web accessable map to view your current location and look dir
 
 This mod was heavily inspired by [CactusPie's Minimap](https://github.com/CactusPie/SPT-Minimap). Without it, this mod wouldn't exist. Especially because I didn't know the polynomial math that was required.
 
-### Instructions
+## Instructions
 Copy the latest [release](https://github.com/NNThomasL/SPTarkovWebMinimap/releases) to your SPTarkov folder.
 
 After opening the game, go to http://localhost:8080/index.html to view the map.
@@ -17,7 +17,7 @@ Here is the latest [VirusTotal scan (Beta 1.1 of project)](https://www.virustota
 
 
 
-# Current Status
+## Current Status
 
 ### Maps:
 - [ ] Factory
