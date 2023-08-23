@@ -27,7 +27,6 @@ let websocket;
 
 let extent = [0, 0, 6539, 4394];
 let viewExtent = [-200, -200, 6739, 4594];
-// const extent = [0, 0, 6539, 4394];
 
 const customProjection = new Projection({
   code: 'xkcd-image',
@@ -81,33 +80,10 @@ function init() {
     })
   });
 
-  // map.setView(new View({
-  //   projection: projection,
-  //   center: getCenter(extent),
-  //   zoom: 1,
-  //   maxZoom: 8,
-  //   extent: map.getView().calculateExtent(map.getSize()),
-  // }));
-
-  // var myExtent = map.getView().calculateExtent(map.getSize());
-  // console.log(myExtent)
-  // map.setView(
-  //   new View({
-  //       projection: projection,
-  //       center: fromLonLat([73.8, 18.5]),
-  //       extent: myExtent,   
-  //       zoom: 1
-  //     })
-  // );
-
   map.on('click', function(event) {
-    var point = event.coordinate; // map.getCoordinateFromPixel(event.pixel);
-    // var lonLat = toLonLat(event.pixel, projection); 
-    // console.log(lonLat);  // note the ordering of the numbers
+    var point = event.coordinate;
 
-    // console.log(`${lastGamePosX} ${event.pixel[0]} ${lastGamePosZ} ${event.pixel[1]}`);
-
-    console.log("event.coordinate:", point);
+    // console.log("event.coordinate:", point);
     console.log(`${lastGamePosX} ${point[0]} ${lastGamePosZ} ${point[1]}`);
 
     playerIconFeature.getGeometry().setCoordinates(point);
@@ -124,7 +100,7 @@ function init() {
     let x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].XCoefficients);
     let z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].ZCoefficients);
 
-    console.log("Polynomial X:", x, "Z:", z);
+    // console.log("Polynomial X:", x, "Z:", z);
 
     // let testCoords = toLonLat(z, x, customProjection);
 
@@ -168,7 +144,7 @@ function init() {
   // Finally attempt to connect
   doConnect();
 
-  changeMap("Shoreline");
+  changeMap("bigmap");
 }
 
 function changeMap(mapName) {
@@ -213,19 +189,6 @@ function doConnect() {
   //websocket.onclose = function(evt) { onClose(evt) }
   websocket.onmessage = function (evt) { onMessage(evt) }
   websocket.onerror = function (evt) { onError(evt) }
-
-
-  // const playerIcon = L.icon({
-  //   iconUrl: '/images/circle_with_arrow.png',
-  //   iconSize: [20, 20],
-  //   className: 'player-icon'
-  // })
-
-  // playerPos = L.latLng([0, 0]);
-  // playerMarker = L.marker(playerPos, {
-  //   icon: playerIcon,
-  //   rotationOrigin: 'center center'
-  // }).addTo(map);
 }
 
 function onMessage(evt) {
@@ -248,11 +211,8 @@ function onMessage(evt) {
 
   if (lastGameMap == "Interchange") {
     if (lastGamePosX > -52 && lastGamePosX < 100 && lastGamePosZ > -180 && lastGamePosZ < 72) {
-      //x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].InteriorFloor2XCoefficients);
-      //z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].InteriorFloor2ZCoefficients);
-
-      // Parking garage
       if (lastGamePosY < 25) {
+        // Parking garage
         //x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].ParkingGarageXCoefficients);
         //z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].ParkingGarageZCoefficients);
       } else if (lastGamePosY > 32) { // Floor 2
@@ -262,17 +222,9 @@ function onMessage(evt) {
     }
   }
 
-  // console.log("X:", x, "Z:", z);
-
   // Move the player marker
   playerIconFeature.getGeometry().setCoordinates([x, z]);
   playerIconFeature.getStyle().getImage().setRotation(((gameMapNamesDict[lastGameMap].MapRotation + lastGameRot) * (Math.PI / 180)));
-
-  // // Set player marker to new position
-  // playerMarker.setLatLng([-z, x]);
-
-  // // Rotate it
-  // playerMarker.setRotationAngle(lastGameRot - 180);
 
   if (shouldFollowPlayer) mapView.setCenter([x, z]);
 }
