@@ -168,7 +168,7 @@ function init() {
   // Finally attempt to connect
   doConnect();
 
-  changeMap("RezervBase");
+  changeMap("Shoreline");
 }
 
 function changeMap(mapName) {
@@ -188,17 +188,21 @@ function changeMap(mapName) {
 
   map.addLayer(mapOverlayImage);
 
-  viewExtent = [gameMapNamesDict[mapName].bounds[2] * -0.2, gameMapNamesDict[mapName].bounds[2] * -0.2, gameMapNamesDict[mapName].bounds[2] * 1.2, gameMapNamesDict[mapName].bounds[3] * 1.2]; // TODO: Instead of a fixed increase, multiply the normal bound size by ~1.1x
+  viewExtent = [gameMapNamesDict[mapName].bounds[2] * -0.1, gameMapNamesDict[mapName].bounds[2] * -0.1, gameMapNamesDict[mapName].bounds[2] * 1.1, gameMapNamesDict[mapName].bounds[3] * 1.1]; // TODO: Instead of a fixed increase, multiply the normal bound size by ~1.1x
 
   mapView = new View({
     projection: customProjection,
     center: getCenter(viewExtent),
-    zoom: 3, // gameMapNamesDict[mapName].followZoomAmount,
-    extent: viewExtent,
+    showFullExtent: true,
+    zoom: gameMapNamesDict[mapName].initialZoom,
+    extent: [0, 0, gameMapNamesDict[mapName].bounds[2], gameMapNamesDict[mapName].bounds[3]], //viewExtent,
     rotation: gameMapNamesDict[mapName].MapRotation * (Math.PI / 180),
   });
 
+  mapView.fit(viewExtent, map.getSize()); 
+
   map.setView(mapView);
+  
 
   currentlyLoadedMap = mapName;
 }
