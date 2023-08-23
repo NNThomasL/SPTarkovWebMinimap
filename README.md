@@ -9,7 +9,7 @@ Copy the latest [release](https://github.com/NNThomasL/SPTarkovWebMinimap/releas
 
 After opening the game, go to http://localhost:8080/index.html to view the map.
 
-You may also open the map on a mobile device using the same URL but replacing 'localhost' with your computer's IP address.
+You can also open the map on a mobile device using the same URL but replacing 'localhost' with your computer's IP address.
 
 Hit the 'F' on the top left of the map to enable follow mode.
 
@@ -34,15 +34,16 @@ Here is the latest [VirusTotal scan (Beta 1.1 of project)](https://www.virustota
 - [x] Follow player button
 - [x] In-game config of port and update frequency
 - [x] Enhanced Interchange map (When you travel to the second floor of the mall, it will move your marker to the second floor map on the right)
-- [ ] Show connect URL in in-game config section
 
 ### To Do:
+- Show connect URL in in-game config section
 - Add toggle layers for loot and other important locations
 - Possible Lab map but I think it would need loot and key layers before release
 - Shoreline Health Resort interior map
 - Remove hardcoded path to plugin folder for web assets
 - Make a default landing page for when the page is opened
 - Make a build script to package the folders in the right structure automatically
+- Fix the parking garage section of the Interchange map. It should have some exterior on the eastern side.
 
 ### Notes:
 This is my first SPTarkov mod and it is very messy. I will clean up the code in the near future but I am currently focusing on how it functions before I worry about maintenance. Silly of me but that is how I work.
