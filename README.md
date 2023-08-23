@@ -4,6 +4,11 @@ This mod creates a web accessable map to view your current location and look dir
 
 This mod was heavily inspired by [CactusPie's Minimap](https://github.com/CactusPie/SPT-Minimap). Without it, this mod wouldn't exist. Especially because I didn't know the polynomial math that was required.
 
+### Instructions
+Copy the latest release to your SPTarkov folder.
+After opening the game, go to http://localhost:8080/index.html to view the map.
+You may also open the map on a mobile device using the same URL but replacing 'localhost' with your computer's IP address.
+
 # Current Status
 
 ### Maps:
@@ -23,9 +28,12 @@ This mod was heavily inspired by [CactusPie's Minimap](https://github.com/Cactus
 - [x] Enhanced Interchange map 
 - [ ] Show connect URL in in-game config section
 
-### Goals:
+### To Do:
 Add toggle layers for loot and other important locations
 Possible Lab map but I think it would need loot and key layers before release
+Remove hardcoded path to plugin folder for web assets
+Make a default landing page for when the page is opened
+Make a build script to package the folders in the right structure automatically
 
 ### Notes:
 This is my first SPTarkov mod and it is very messy. I will clean up the code in the near future but I am currently focusing on how it functions before I worry about maintenance. Silly of me but that is how I work.
