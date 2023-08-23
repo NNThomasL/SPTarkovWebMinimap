@@ -33,8 +33,7 @@ Here is the latest [VirusTotal scan (Beta 1.1 of project)](https://www.virustota
 ### Features:
 - [x] Follow player button
 - [x] In-game config of port and update frequency
-- [x] Enhanced Interchange map 
-	When you travel to the second floor of the mall, it will move your marker to the second floor map on the right
+- [x] Enhanced Interchange map (When you travel to the second floor of the mall, it will move your marker to the second floor map on the right)
 - [ ] Show connect URL in in-game config section
 
 ### To Do:
