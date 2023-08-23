@@ -1,0 +1,15 @@
+{
+    "MapName": "Lighthouse",
+    "MapImageFile": "lighthouse_loot_map.png",
+    "MapRotation": -90,
+    "XCoefficients": [
+        1092.0511505405811,
+        -2.0571470578109485
+    ],
+    "ZCoefficients": [
+        1440.7177800485995,
+        -2.052591550931213
+    ],
+    "bounds": [0, 0, 2242, 3891],
+    "followZoomAmount": 3
+}

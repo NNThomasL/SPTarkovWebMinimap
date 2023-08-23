@@ -1,0 +1,21 @@
+@import "node_modules/ol/ol.css";
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background-color: #5A7058;
+}
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+.follow-player {
+  top: 65px;
+  left: .5em;
+}
+.ol-touch .follow-player {
+  top: 80px;
+}

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>SPTarkov Web Minimap</title>
+    <link rel="icon" type="image/png" href="./favicon.png" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin="" />
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+
+    <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
+    <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
+
+    <script src="rotatedMarker.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/openlayers/7.5.1/dist/ol.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/openlayers/7.5.1/ol.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+        }
+
+        html, body, #map {
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        const customs_loot_map_data = {
+            "MapName": "Customs",
+            "MapImageFile": "customs_loot_map.png",
+            "MapRotation": 0,
+            "XCoefficients": [
+                2683.6046037239607,
+                -3.927968765512377
+            ],
+            "ZCoefficients": [
+                -1032.1683393778137,
+                3.9834771650314904
+            ],
+            "bounds": [[0, 0], [2142, 4097]],
+            "followZoomAmount": 1
+        }
+
+        const shoreline_map_data = {
+            "MapName": "Shoreline",
+            "MapImageFile": "shoreline_map.png",
+            "MapRotation": 0,
+            "XCoefficients": [
+                964.8431586856726,
+                -2.00400347992142
+            ],
+            "ZCoefficients": [
+                -1198.2629996946114,
+                1.9293038457512148
+            ],
+            "bounds": [[0, 0], [1980, 3820]],
+            "followZoomAmount": 2
+        }
+
+        const interchange_map_data = {
+            "MapName": "Interchange",
+            "MapImageFile": "interchange_map_modified.png",
+            "MapRotation": 0,
+            "XCoefficients": [
+                2203.0006038562183,
+                -4.049128593164473
+            ],
+            "ZCoefficients": [
+                -1240.5631027940494,
+                3.0268551014467446
+            ],
+            "InteriorFloor2XCoefficients": [
+                3749.241922164323,
+                -4.8580938330422425
+            ],
+            "InteriorFloor2ZCoefficients": [
+                -1243.8646222369562,
+                3.640703282748387
+            ],
+            "ParkingGarageXCoefficients": [
+                377.6502204671253,
+                -3.2054914562453636
+            ],
+            "ParkingGarageZCoefficients": [
+                -638.6826838004788,
+                2.3914987189432155
+            ],
+            "bounds": [[0, 0], [2704, 4190]],
+            "followZoomAmount": 1
+        }
+
+        const streets_of_tarkov_map_data = {
+            "MapName": "Streets Of Tarkov",
+            "MapImageFile": "streets_of_tarkov_map.png",
+            "MapRotation": 0,
+            "XCoefficients": [
+                3116.828558033624,
+                -6.145503808298861
+            ],
+            "ZCoefficients": [
+                -3781.8394913346356,
+                6.113650640364941
+            ],
+            "bounds": [0, 0, 4394, 6539],
+            "followZoomAmount": 1
+        }
+
+        const woods_map_data = {
+            "MapName": "Woods",
+            "MapImageFile": "woods_map.png",
+            "MapRotation": 0,
+            "XCoefficients": [
+                3260.6887233270527,
+                -4.814034920675572
+            ],
+            "ZCoefficients": [
+                -2309.1250448818582,
+                4.807915282301284
+            ],
+            "bounds": [0, 0, 6843, 6994],
+            "followZoomAmount": 0
+        }
+
+        const lighthouse_map_data = {
+            "MapName": "Lighthouse",
+            "MapImageFile": "lighthouse_loot_map.png",
+            "MapRotation": -90,
+            "XCoefficients": [
+                1095.175396123712,
+                -2.0362047782106165
+            ],
+            "ZCoefficients": [
+                -1434.8211462753466,
+                2.0540171282266737
+            ],
+            "bounds": [0, 0, 2242, 3891],
+            "followZoomAmount": 1
+        }
+
+        const gameMapNamesDict = {
+            "bigmap": customs_loot_map_data,
+            "Shoreline": shoreline_map_data,
+            "Interchange": interchange_map_data,
+            "TarkovStreets": streets_of_tarkov_map_data,
+            "Woods": woods_map_data,
+            "Lighthouse": lighthouse_map_data,
+        };
+
+        let map;
+        let mapOverlayImage;
+        let playerMarker;
+        let currentlyLoadedMap;
+
+        let shouldFollowPlayer = false;
+
+        let lastGameRot = 0;
+        let lastGamePosX = 0;
+        let lastGamePosZ = 0;
+        let lastGamePosY = 0;
+
+        function init()
+        {
+            const extent = [0, 0, 4394, 6539];
+
+            const projection = new ol.proj.Projection({
+                code: 'pixel-map',
+                units: 'pixels',
+                extent
+            });
+
+            map = new ol.Map({
+                target: 'map',
+                view: new ol.View({
+                    resolution: 1,
+                    projection,
+                    center: ol.extent.getCenter(extent),
+                    zoom: 2,
+                    minZoom: 2,
+                    maxZoom: 8
+                })
+            });
+
+            let imageLayer = new ol.layer.Image({
+                source: new ol.source.ImageStatic({
+                    url: "http://imgs.xkcd.com/comics/online_communities.png",
+                    projection: projection,
+                    imageExtent: extent,
+                })
+            })
+
+            map.addLayer(imageLayer);
+
+            //map.on('click', onMapClick);
+
+            //L.easyButton('<span>🥾</span>', function (btn, map) {
+            //    shouldFollowPlayer = !shouldFollowPlayer;
+            //}).addTo(map);
+
+            doConnect()
+
+            // TODO: Handle map rotation https://github.com/CactusPie/SPT-Minimap/blob/master/src/CactusPie.MapLocation.Minimap/Maps/Lighthouse%20Loot.json
+        }
+
+        function changeMap(mapName) {
+            console.log("Changing map to:", mapName);
+
+            if (mapOverlayImage && map.hasLayer(mapOverlayImage)) {
+                map.removeLayer(mapOverlayImage);
+            }
+
+            mapOverlayImage = L.imageOverlay(`/maps/${gameMapNamesDict[mapName].MapImageFile}`, gameMapNamesDict[mapName].bounds).addTo(map);
+
+            map.fitBounds(gameMapNamesDict[mapName].bounds);
+
+            currentlyLoadedMap = mapName;
+        }
+
+        function onMapClick(e) {
+            var clientClick = map.project(e.latlng);
+
+            //Grab the original overlay
+            var overlayImage = mapOverlayImage._image;
+
+            //Calculate the current image ratio from the original (deals with zoom)
+            var yR = overlayImage.clientHeight / overlayImage.naturalHeight;
+            var xR = overlayImage.clientWidth / overlayImage.naturalWidth;
+
+            //scale the click coordinates to the original dimensions
+            //basically compensating for the scaling calculated by the map projection
+            var picX = clientClick.x / xR;
+            var picY = clientClick.y / yR;
+
+            console.log(lastGamePosX, picX, lastGamePosZ, picY); // Plug this line into CactusPie's Minimap EXE in Map Creation mode to create polynomial coefficients
+        }
+
+        function doConnect()
+        {
+            websocket = new WebSocket("ws://" + location.host + "/")
+            //websocket.onopen = function(evt) { onOpen(evt) }
+            //websocket.onclose = function(evt) { onClose(evt) }
+            websocket.onmessage = function(evt) { onMessage(evt) }
+            websocket.onerror = function (evt) { onError(evt) }
+
+
+            const playerIcon = L.icon({
+                iconUrl: '/images/circle_with_arrow.png',
+                iconSize: [20, 20],
+                className: 'player-icon'
+            })
+
+            playerPos = L.latLng([0, 0]);
+            playerMarker = L.marker(playerPos, {
+                icon: playerIcon,
+                rotationOrigin: 'center center'
+            }).addTo(map);
+        }
+
+        function onMessage(evt)
+        {
+            let incomingMessageJSON = JSON.parse(evt.data);
+
+            lastGameMap = incomingMessageJSON.mapName;
+            lastGameRot = incomingMessageJSON.playerRotationX;
+            lastGamePosX = incomingMessageJSON.playerPositionX;
+            lastGamePosZ = incomingMessageJSON.playerPositionZ;
+            lastGamePosY = incomingMessageJSON.playerPositionY;
+
+            console.log(lastGameMap, lastGameRot, lastGamePosX, lastGamePosZ, lastGamePosY);
+
+            if (currentlyLoadedMap !== lastGameMap) {
+                changeMap(lastGameMap);
+            }
+
+            let x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].XCoefficients);
+            let z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].ZCoefficients);
+
+            if (lastGameMap == "Interchange") {
+                if (lastGamePosX > -52 && lastGamePosX < 100 && lastGamePosZ > -180 && lastGamePosZ < 72) {
+                    //x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].InteriorFloor2XCoefficients);
+                    //z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].InteriorFloor2ZCoefficients);
+
+                    // Parking garage
+                    if (lastGamePosY < 25) {
+                        //x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].ParkingGarageXCoefficients);
+                        //z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].ParkingGarageZCoefficients);
+                    } else if (lastGamePosY > 32) { // Floor 2
+                        x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].InteriorFloor2XCoefficients);
+                        z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].InteriorFloor2ZCoefficients);
+                    }
+                }
+            }
+
+            // Set player marker to new position
+            playerMarker.setLatLng([-z, x]);
+
+            // Rotate it
+            playerMarker.setRotationAngle(lastGameRot - 180);
+
+            if (shouldFollowPlayer) map.setView([-z, x], gameMapNamesDict[lastGameMap].followZoomAmount);
+        }
+
+        function onError(evt)
+        {
+            websocket.close()
+        }
+
+        window.addEventListener("load", init, false)
+
+        function doDisconnect()
+        {
+            websocket.close()
+        }
+
+        function calculatePolynomialValue(x, coefficients)
+        {
+            let result = 0;
+
+            result = coefficients[0];
+
+            result += coefficients[1] * x;
+
+            return result;
+        }
+    </script>
+
+    <div id="map"></div>
+</body>
+</html>
