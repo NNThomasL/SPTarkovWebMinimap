@@ -272,7 +272,7 @@ class FollowPlayerControl extends Control {
     const options = opt_options || {};
 
     const button = document.createElement('button');
-    button.innerHTML = 'F';
+    button.innerHTML = '🧭';
 
     const element = document.createElement('div');
     element.className = 'follow-player ol-unselectable ol-control';
