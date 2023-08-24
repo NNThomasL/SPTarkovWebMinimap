@@ -27,7 +27,7 @@ namespace TechHappy.MinimapSender
             RefreshIntervalMillieconds = Config.Bind
             (
                 configSection,
-                nameof(RefreshIntervalMillieconds),
+                "Refresh Interval (milliseconds)",
                 250,
                 new ConfigDescription
                 (
@@ -39,11 +39,11 @@ namespace TechHappy.MinimapSender
             DestinationPort = Config.Bind
             (
                 configSection,
-                nameof(DestinationPort),
+                "Map Port",
                 8080,
                 new ConfigDescription
                 (
-                    "Destination Port",
+                    "Map URL is http://localhost:(this setting)/index.html",
                     new AcceptableValueRange<int>(1024, 65535)
                 )
             );

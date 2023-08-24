@@ -43,7 +43,9 @@ Here is the latest [VirusTotal scan (Beta 1.1 of project)](https://www.virustota
 - Remove hardcoded path to plugin folder for web assets
 - Make a default landing page for when the page is opened
 - Make a build script to package the folders in the right structure automatically
-- Fix the parking garage section of the Interchange map. It should have some exterior on the eastern side.
+- Fix the parking garage section of the Interchange map. It should have some exterior on the eastern side
+- Possibly modify the Woods map to line up cache spots with my coordinates
+- Change the follow player button to use an icon instead of an F which could be confused with fullscreen
 
 ### Notes:
 This is my first SPTarkov mod and it is very messy. I will clean up the code in the near future but I am currently focusing on how it functions before I worry about maintenance. Silly of me but that is how I work.

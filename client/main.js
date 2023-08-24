@@ -144,7 +144,28 @@ function init() {
   // Finally attempt to connect
   doConnect();
 
-  changeMap("bigmap");
+  // changeMap("bigmap");
+
+  mapOverlayImage = new ImageLayer({
+    source: new Static({
+      url: `/maps/enter_a_raid.png`,
+      projection: customProjection,
+      imageExtent: [0, 0, 600, 400],
+    }),
+  }),
+
+  map.addLayer(mapOverlayImage);
+
+  mapView = new View({
+    projection: customProjection,
+    center: [-100, -100, 700, 500],
+    showFullExtent: true,
+    zoom: 3,
+    extent: [0, 0, 600, 400], //viewExtent,
+    rotation: 0,
+  });
+
+  map.setView(mapView);
 }
 
 function changeMap(mapName) {

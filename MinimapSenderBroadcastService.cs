@@ -99,10 +99,6 @@ namespace TechHappy.MinimapSender
         public void Dispose()
         {
             _timer?.Dispose();
-
-            // Stop the server
-            //MinimapSenderPlugin.MinimapSenderLogger.LogInfo("Server stopping...");
-            //MinimapSenderPlugin._server.Stop();
         }
     }
 }
@@ -115,10 +111,6 @@ class WebsocketSession : WsSession
     public override void OnWsConnected(HttpRequest request)
     {
         MinimapSenderPlugin.MinimapSenderLogger.LogInfo($"Minimap WebSocket session with Id {Id} connected!");
-
-        // Send invite message
-        //string message = "Hello from WebSocket chat! Please send a message or '!' to disconnect the client!";
-        //SendTextAsync(message);
     }
 
     public override void OnWsDisconnected()
