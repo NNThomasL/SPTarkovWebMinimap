@@ -13,7 +13,7 @@ You can also open the map on a mobile device using the same URL but replacing 'l
 
 Hit the 'F' on the top left of the map to enable follow mode.
 
-Here is the latest [VirusTotal scan (Beta 1.2 of project)](https://www.virustotal.com/gui/file/4177a959a5ec52f6e3c57d1660e547dee172854b8b1e48baf1581f003afad7c6?nocache=1). If you are worried about security, I ask that you check and compile the code yourself. The project is pretty small so it should be a quick read and simple compile/bundle.
+Here is the latest [VirusTotal scan (Release 1.0 of project)](https://www.virustotal.com/gui/file/9da3d8ef572672343a406fb941ac2980412cd6d57661651b48cfbbc16a6a693c?nocache=1). If you are worried about security, I ask that you check and compile the code yourself. The project is pretty small so it should be a quick read and simple compile/bundle.
 
 
 
@@ -41,6 +41,7 @@ Here is the latest [VirusTotal scan (Beta 1.2 of project)](https://www.virustota
 - Remove hardcoded path to plugin folder for web assets
 - Fix the parking garage section of the Interchange map. It should have some exterior on the eastern side
 - Possibly modify the Woods map to line up cache spots with my coordinates
+- Make is so that the index.html is not needed in the connect URL
 
 ### Notes:
 This is my first SPTarkov mod and it is very messy. I will clean up the code in the near future but I am currently focusing on how it functions before I worry about maintenance. Silly of me but that is how I work.
