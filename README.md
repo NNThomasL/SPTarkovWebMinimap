@@ -22,26 +22,23 @@ Here is the latest [VirusTotal scan (Beta 1.2 of project)](https://www.virustota
 ### Maps:
 - [x] Woods
 - [x] Customs
-- [x] Interchange
+- [x] Interchange (Enhanced with floor number detection)
 - [x] Reserve
 - [x] Shoreline
 - [x] Lighthouse
-- [x] Streets
-- [ ] Factory - Is the map needed?
-- [ ] The Lab
+- [x] Streets Of Tarkov
+- [x] The Lab (Enhanced with floor number detection)
+- [ ] Factory - Is the map needed? Currently unable to map coordinates to image.
 
 ### Features:
 - [x] Follow player button
 - [x] In-game config of port and update frequency
-- [x] Enhanced Interchange map (When you travel to the second floor of the mall, it will move your marker to the second floor map on the right)
 
 ### To Do:
 - Show connect URL in in-game config section. Not sure how to do that yet...
-- Add toggle layers for loot and other important locations
-- Possible Lab map but I think it would need loot and key layers before adding
+- Add toggle layers for loot and other important locations (maybe)
 - Shoreline Health Resort interior map
 - Remove hardcoded path to plugin folder for web assets
-- Make a build script to package the folders in the right structure automatically
 - Fix the parking garage section of the Interchange map. It should have some exterior on the eastern side
 - Possibly modify the Woods map to line up cache spots with my coordinates
 

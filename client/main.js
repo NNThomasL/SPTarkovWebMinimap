@@ -22,6 +22,8 @@ import lighthouse_loot_map_data from './map_data/lighthouse_loot_map_data.json';
 import shoreline_map_data from './map_data/shoreline_map_data.json';
 import interchange_map_data from './map_data/interchange_map_modified_data.json';
 import reserve_map_data from './map_data/reserve_map_data.json';
+import laboratory_loot_map_data from './map_data/laboratory_loot_map_modified_data.json';
+import factory_map_data from './map_data/factory_map_data.json';
 
 let websocket;
 
@@ -52,14 +54,15 @@ let lastGamePosY = 0;
 
 const gameMapNamesDict = {
   "bigmap": customs_loot_map_data,
-  // "Shoreline": shoreline_map_data,
-  // "Interchange": interchange_map_data,
   "TarkovStreets": streets_of_tarkov_map_data,
   "Woods": woods_map_data,
   "Lighthouse": lighthouse_loot_map_data,
   "Shoreline": shoreline_map_data,
   "Interchange": interchange_map_data,
-  "RezervBase": reserve_map_data
+  "RezervBase": reserve_map_data,
+  "laboratory": laboratory_loot_map_data,
+  "factory4_day": factory_map_data,
+  "factory4_night": factory_map_data
 };
 
 
@@ -241,6 +244,20 @@ function onMessage(evt) {
         z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].InteriorFloor2ZCoefficients);
       }
     }
+  } else if (lastGameMap == "laboratory") {
+    if (lastGamePosY > 3) {
+      x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].Floor2XCoefficients);
+      z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].Floor2ZCoefficients);
+    } else if (lastGamePosY < -2) {
+      x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].TechnicalLevelXCoefficients);
+      z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].TechnicalLevelZCoefficients);
+      // Rotate just the marker instead of the whole map
+      // lastGameRot = lastGameRot - 90;
+    }
+  } else if (lastGameMap == "factory4_day" || lastGameMap == "factory4_night") {
+    // This map doesn't work
+    x = 0;
+    z = 0;
   }
 
   // Move the player marker
