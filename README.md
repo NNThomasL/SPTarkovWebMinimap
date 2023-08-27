@@ -44,3 +44,10 @@ Here is the latest [VirusTotal scan (Release 1.0.1 of project)](https://www.viru
 
 ### Notes:
 This is my first SPTarkov mod and it is very messy. I will clean up the code in the near future but I am currently focusing on how it functions before I worry about maintenance. Silly of me but that is how I work.
+
+## Build Process
+
+Compile the BepInEx client mod using the provided .csproj file. Open the client folder in your IDE of choice and bundle the web code using "npm run build".
+
+From bin/Debug/net472 copy TechHappy.MinimapSender.dll and NetCoreServer.dll into BepInEx/plugins/TechHappy-MinimapSender.
+From client/dist copy the contents into BepInEx/plugins/TechHappy-MinimapSender/www.
