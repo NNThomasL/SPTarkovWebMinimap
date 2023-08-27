@@ -48,6 +48,15 @@ namespace TechHappy.MinimapSender
         {
             _timer.Interval = interval;
             _timer.Start();
+
+            try
+            {
+                SendData();
+            }
+            catch (Exception e)
+            {
+                MinimapSenderPlugin.MinimapSenderLogger.LogError($"Exception {e.GetType()} occured. Message: {e.Message}. StackTrace: {e.StackTrace}");
+            }
         }
 
         public void StopBroadcastingPosition()

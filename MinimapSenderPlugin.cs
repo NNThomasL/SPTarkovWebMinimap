@@ -32,7 +32,7 @@ namespace TechHappy.MinimapSender
                 new ConfigDescription
                 (
                     "Map position refresh interval in milliseconds (1 second = 1000 milliseconds)",
-                    new AcceptableValueRange<int>(50, 5000)
+                    new AcceptableValueRange<int>(50, 30000)
                 )
             );
 
