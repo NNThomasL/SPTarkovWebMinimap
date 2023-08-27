@@ -36,6 +36,8 @@ const customProjection = new Projection({
   extent: extent,
 });
 
+let enableLogging = false;
+
 let map;
 let mapView;
 let mapOverlayImage;
@@ -89,28 +91,28 @@ function init() {
     // console.log("event.coordinate:", point);
     console.log(`${lastGamePosX} ${point[0]} ${lastGamePosZ} ${point[1]}`);
 
-    playerIconFeature.getGeometry().setCoordinates(point);
+    // playerIconFeature.getGeometry().setCoordinates(point);
 
     // DEBUG STUFF BELOW
-    lastGameMap = 'TarkovStreets';
-    lastGameRot = 90;
-    lastGamePosX = -84.273;
-    lastGamePosZ = 177.886;
-    lastGamePosY = 1.41552567;
+    // lastGameMap = 'TarkovStreets';
+    // lastGameRot = 90;
+    // lastGamePosX = -84.273;
+    // lastGamePosZ = 177.886;
+    // lastGamePosY = 1.41552567;
 
-    console.log("Last Game Data:", lastGameMap, lastGameRot, lastGamePosX, lastGamePosZ, lastGamePosY);
+    // console.log("Last Game Data:", lastGameMap, lastGameRot, lastGamePosX, lastGamePosZ, lastGamePosY);
 
-    let x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].XCoefficients);
-    let z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].ZCoefficients);
+    // let x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].XCoefficients);
+    // let z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].ZCoefficients);
 
     // console.log("Polynomial X:", x, "Z:", z);
 
     // let testCoords = toLonLat(z, x, customProjection);
 
     // Move the player marker
-    playerIconFeature.getGeometry().setCoordinates([x, z]);
+    // playerIconFeature.getGeometry().setCoordinates([x, z]);
 
-    playerIconFeature.getStyle().getImage().setRotation(lastGameRot * (Math.PI / 180));
+    // playerIconFeature.getStyle().getImage().setRotation(lastGameRot * (Math.PI / 180));
   });
 
   // Player marker stuff
@@ -224,7 +226,7 @@ function onMessage(evt) {
   lastGamePosZ = incomingMessageJSON.playerPositionZ;
   lastGamePosY = incomingMessageJSON.playerPositionY;
 
-  console.log(lastGameMap, lastGameRot, lastGamePosX, lastGamePosZ, lastGamePosY);
+  if (enableLogging) console.log(lastGameMap, lastGameRot, lastGamePosX, lastGamePosZ, lastGamePosY);
 
   if (currentlyLoadedMap !== lastGameMap) {
     changeMap(lastGameMap);
@@ -251,8 +253,6 @@ function onMessage(evt) {
     } else if (lastGamePosY < -2) {
       x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].TechnicalLevelXCoefficients);
       z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].TechnicalLevelZCoefficients);
-      // Rotate just the marker instead of the whole map
-      // lastGameRot = lastGameRot - 90;
     }
   } else if (lastGameMap == "factory4_day" || lastGameMap == "factory4_night") {
     // This map doesn't work
