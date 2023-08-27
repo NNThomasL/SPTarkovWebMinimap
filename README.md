@@ -13,7 +13,7 @@ You can also open the map on a mobile device using the same URL but replacing 'l
 
 Hit the '🧭' on the top left of the map to enable follow mode.
 
-Here is the latest [VirusTotal scan (Release 1.2 of project)](https://www.virustotal.com/gui/file/96d9cb598ec9a260a6343c60b177378245ef682e07018e980ed8e1a2d8fd8b97?nocache=1). If you are worried about security, I ask that you check and compile the code yourself. The project is pretty small so it should be a quick read and simple compile/bundle.
+Here is the latest [VirusTotal scan (Release 1.0.1 of project)](https://www.virustotal.com/gui/file/5f1da8b87fcc494ea4e99149e7244e44f2df61fab9c2bc85f1180d44bebae023?nocache=1). If you are worried about security, I ask that you check and compile the code yourself. The project is pretty small so it should be a quick read and simple compile/bundle.
 
 
 
