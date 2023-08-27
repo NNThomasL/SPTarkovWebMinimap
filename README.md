@@ -13,7 +13,7 @@ You can also open the map on a mobile device using the same URL but replacing 'l
 
 Hit the '🧭' on the top left of the map to enable follow mode.
 
-Here is the latest [VirusTotal scan (Release 1.0 of project)](https://www.virustotal.com/gui/file/9da3d8ef572672343a406fb941ac2980412cd6d57661651b48cfbbc16a6a693c?nocache=1). If you are worried about security, I ask that you check and compile the code yourself. The project is pretty small so it should be a quick read and simple compile/bundle.
+Here is the latest [VirusTotal scan (Release 1.1 of project)](https://www.virustotal.com/gui/file/c4183bb48e9a95edec0b9d5f38dc7fa375ef884c0334397c52b9be65619902e6?nocache=1). If you are worried about security, I ask that you check and compile the code yourself. The project is pretty small so it should be a quick read and simple compile/bundle.
 
 
 
@@ -39,10 +39,8 @@ Here is the latest [VirusTotal scan (Release 1.0 of project)](https://www.virust
 - Add toggle layers for loot and other important locations (maybe)
 - Shoreline Health Resort interior map
 - Remove hardcoded path to plugin folder for web assets
-- Fix the parking garage section of the Interchange map. It should have some exterior on the eastern side
 - Possibly modify the Woods map to line up cache spots with my coordinates
 - Make is so that the index.html is not needed in the connect URL
-- Disable constant logging. Toggle it using browser's dev console or a button
 
 ### Notes:
 This is my first SPTarkov mod and it is very messy. I will clean up the code in the near future but I am currently focusing on how it functions before I worry about maintenance. Silly of me but that is how I work.
