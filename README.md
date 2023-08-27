@@ -40,7 +40,7 @@ Here is the latest [VirusTotal scan (Release 1.0.1 of project)](https://www.viru
 - Shoreline Health Resort interior map
 - Remove hardcoded path to plugin folder for web assets
 - Possibly modify the Woods map to line up cache spots with my coordinates
-- Make is so that the index.html is not needed in the connect URL
+- Make it so that the index.html is not needed in the connect URL
 
 ### Notes:
 This is my first SPTarkov mod and it is very messy. I will clean up the code in the near future but I am currently focusing on how it functions before I worry about maintenance. Silly of me but that is how I work.

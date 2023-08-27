@@ -80,18 +80,25 @@ namespace TechHappy.MinimapSender
 
         private void SendData()
         {
-            string mapName = _gamePlayerOwner.Player.Location;
-            Vector3 playerPosition = _gamePlayerOwner.Player.Position;
-            Vector2 playerRotation = _gamePlayerOwner.Player.Rotation;
-
-            MinimapSenderPlugin._server.MulticastText(JsonConvert.SerializeObject(new
+            try
             {
-                mapName = mapName,
-                playerRotationX = playerRotation.x,
-                playerPositionX = playerPosition.x,
-                playerPositionZ = playerPosition.z,
-                playerPositionY = playerPosition.y
-            }));
+                string mapName = _gamePlayerOwner.Player.Location;
+                Vector3 playerPosition = _gamePlayerOwner.Player.Position;
+                Vector2 playerRotation = _gamePlayerOwner.Player.Rotation;
+
+                MinimapSenderPlugin._server.MulticastText(JsonConvert.SerializeObject(new
+                {
+                    mapName = mapName,
+                    playerRotationX = playerRotation.x,
+                    playerPositionX = playerPosition.x,
+                    playerPositionZ = playerPosition.z,
+                    playerPositionY = playerPosition.y
+                }));
+            }
+            catch (Exception e)
+            {
+                MinimapSenderPlugin.MinimapSenderLogger.LogError($"Exception {e.GetType()} occured. Message: {e.Message}. StackTrace: {e.StackTrace}");
+            }
         }
 
         private Player GetLocalPlayerFromWorld()
