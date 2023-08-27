@@ -69,6 +69,7 @@ const gameMapNamesDict = {
 
 
 function init() {
+  console.log("init() called");
   const mousePositionControl = new MousePosition({
     projection: customProjection,
   });
@@ -100,7 +101,7 @@ function init() {
     // lastGamePosZ = 177.886;
     // lastGamePosY = 1.41552567;
 
-    // console.log("Last Game Data:", lastGameMap, lastGameRot, lastGamePosX, lastGamePosZ, lastGamePosY);
+    console.log("Last Game Data:", lastGameMap, lastGameRot, lastGamePosX, lastGamePosZ, lastGamePosY);
 
     // let x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].XCoefficients);
     // let z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].ZCoefficients);
@@ -215,6 +216,7 @@ function doConnect() {
   //websocket.onclose = function(evt) { onClose(evt) }
   websocket.onmessage = function (evt) { onMessage(evt) }
   websocket.onerror = function (evt) { onError(evt) }
+  console.log("Connected to websocket");
 }
 
 function onMessage(evt) {
@@ -236,11 +238,11 @@ function onMessage(evt) {
   let z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].ZCoefficients);
 
   if (lastGameMap == "Interchange") {
-    if (lastGamePosX > -52 && lastGamePosX < 100 && lastGamePosZ > -180 && lastGamePosZ < 72) {
-      if (lastGamePosY < 25) {
-        // Parking garage
-        //x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].ParkingGarageXCoefficients);
-        //z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].ParkingGarageZCoefficients);
+    // Main mall bounding box + Goshan extension
+    if ((lastGamePosX < 83 && lastGamePosX > -157.8 && lastGamePosZ < 193.2 && lastGamePosZ > -303.87) || (lastGamePosX < -157.8 && lastGamePosX > -183.4 && lastGamePosZ < 69 && lastGamePosZ > -178.66)) {
+      if (lastGamePosY < 23) { // Parking garage
+        x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].ParkingGarageXCoefficients);
+        z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].ParkingGarageZCoefficients);
       } else if (lastGamePosY > 32) { // Floor 2
         x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].InteriorFloor2XCoefficients);
         z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].InteriorFloor2ZCoefficients);
@@ -268,7 +270,8 @@ function onMessage(evt) {
 }
 
 function onError(evt) {
-  websocket.close()
+  console.error(evt);
+  websocket.close();
 }
 
 function calculatePolynomialValue(x, coefficients) {
