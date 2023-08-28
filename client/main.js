@@ -212,11 +212,10 @@ function changeMap(mapName) {
 
 function doConnect() {
   websocket = new WebSocket("ws://" + location.host + "/")
-  //websocket.onopen = function(evt) { onOpen(evt) }
-  //websocket.onclose = function(evt) { onClose(evt) }
+  websocket.onopen = function(evt) { onOpen(evt) }
+  websocket.onclose = function(evt) { onClose(evt) }
   websocket.onmessage = function (evt) { onMessage(evt) }
   websocket.onerror = function (evt) { onError(evt) }
-  console.log("Connected to websocket");
 }
 
 function onMessage(evt) {
@@ -264,9 +263,17 @@ function onMessage(evt) {
 
   // Move the player marker
   playerIconFeature.getGeometry().setCoordinates([x, z]);
-  playerIconFeature.getStyle().getImage().setRotation(((gameMapNamesDict[lastGameMap].MapRotation + lastGameRot) * (Math.PI / 180)));
+  playerIconFeature.getStyle().getImage().setRotation((gameMapNamesDict[lastGameMap].MapRotation + lastGameRot) * (Math.PI / 180));
 
   if (shouldFollowPlayer) mapView.setCenter([x, z]);
+}
+
+function onOpen(evt) {
+  console.log("Opened websocket");
+}
+
+function onClose(evt) {
+  console.log("Websocket closed");
 }
 
 function onError(evt) {
@@ -312,4 +319,5 @@ class FollowPlayerControl extends Control {
   }
 }
 
-window.addEventListener("load", init, false)
+// window.addEventListener("load", init, false)
+window.init = init;
