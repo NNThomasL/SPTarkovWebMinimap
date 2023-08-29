@@ -51,3 +51,14 @@ Compile the BepInEx client mod using the provided .csproj file. Open the client 
 
 From bin/Debug/net472 copy TechHappy.MinimapSender.dll and NetCoreServer.dll into BepInEx/plugins/TechHappy-MinimapSender.
 From client/dist copy the contents into BepInEx/plugins/TechHappy-MinimapSender/www.
+
+## Coordinate Mapping Process
+
+Open the web map and enter a raid on a map that you want to adjust. Stand next to easy to mark locations on the map image and in the browser, click on the exact location you are standing. Some good locations are the corners of buildings, ends of fences, and anything with a defined edge or corner.
+In the browser's developer console, look for a line of just four numbers that pop up with each click. Those numbers are the game's position x, map image x, position z, and map z coordinates.
+Open CactusPie's Minimap mod's executable. Set the map to Customs. 
+Enter "Map creation mode" using the checkbox on the top left. Delete the entries in "Added map positions" and paste in the coordinates you get from the web map log. 
+Note that you want many accurate position coordinate pairs entered for a good result. 
+Hit "Update map transforms" and open CactusPie's Minimap mod's Maps/Customs.json file. 
+Copy the "XCoefficients" and "ZCoefficients" into my project's map_data.json file for the map you are adjusting. 
+Just re-bundle and use the new dist/ files and you are set.
