@@ -33,12 +33,12 @@ Here is the latest [VirusTotal scan (Release 1.0.1 of project)](https://www.viru
 ### Features:
 - [x] Follow player button
 - [x] In-game config of port and update frequency
+- [x] Airdrop markers for when the box lands
+- [x] Quest indicators for active quests
 
 ### To Do:
 - Show connect URL in in-game config section. Not sure how to do that yet...
-- Add toggle layers for loot and other important locations (maybe)
 - Shoreline Health Resort interior map
-- Remove hardcoded path to plugin folder for web assets
 - Possibly modify the Woods map to line up cache spots with my coordinates
 - Make it so that the index.html is not needed in the connect URL
 

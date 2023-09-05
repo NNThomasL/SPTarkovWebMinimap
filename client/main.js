@@ -7,13 +7,16 @@ import Static from 'ol/source/ImageStatic.js';
 import View from 'ol/View.js';
 import { getCenter } from 'ol/extent.js';
 import { Point } from 'ol/geom';
-import { Feature} from 'ol';
-import {Icon, Style} from 'ol/style.js';
+import { Feature, Overlay } from 'ol';
+import {Icon, Style, Fill} from 'ol/style.js';
 import {Vector as VectorSource} from 'ol/source.js';
 import {Vector as VectorLayer} from 'ol/layer.js';
 import MousePosition from 'ol/control/MousePosition';
 import {Control, defaults as defaultControls} from 'ol/control.js';
 import {defaults as defaultInteractions} from 'ol/interaction/defaults';
+import {pointerMove} from 'ol/events/condition.js';
+import Select from 'ol/interaction/Select.js';
+import Popup from 'ol-popup/src/ol-popup';
 
 import streets_of_tarkov_map_data from './map_data/streets_of_tarkov_map_data.json';
 import customs_loot_map_data from './map_data/customs_loot_map_data.json';
@@ -36,7 +39,7 @@ const customProjection = new Projection({
   extent: extent,
 });
 
-let enableLogging = false;
+const popup = new Popup();
 
 let map;
 let mapView;
@@ -45,14 +48,60 @@ let playerMarker;
 let currentlyLoadedMap;
 let playerVectorLayer;
 let playerIconFeature;
+let airdropVectorLayer;
+let airdropVectorSource;
+let airdropFeatures = [];
+let questVectorLayer;
+let questVectorSource;
+let questFeatures = [];
+let questPopoverOverlay;
+let selectedFeature;
+
+// const selected = new Style({
+//   fill: new Fill({
+//     color: '#eeeeee',
+//   }),
+//   stroke: new Stroke({
+//     color: 'rgba(255, 255, 255, 0.7)',
+//     width: 2,
+//   }),
+// });
+
+const airdropIconStyle = new Style({
+  image: new Icon({
+    anchor: [0.5, 0.5],
+    anchorXUnits: 'fraction',
+    anchorYUnits: 'fraction',
+    src: '/images/airdrop.png',
+    scale: 0.5
+    // width: 10,
+    // height: 10
+  })
+});
+
+const questIconStyle = new Style({
+  image: new Icon({
+    anchor: [0.5, 0.5],
+    anchorXUnits: 'fraction',
+    anchorYUnits: 'fraction',
+    src: '/images/contract-with-background.png',
+    scale: 0.5
+    // width: 10,
+    // height: 10
+  })
+});
 
 let shouldFollowPlayer = false;
 
+let activeRaidCounter = 0;
 let lastGameMap = "";
 let lastGameRot = 0;
 let lastGamePosX = 0;
 let lastGamePosZ = 0;
 let lastGamePosY = 0;
+let lastAirdrops = [];
+let lastQuests = [];
+let activeQuests = [];
 
 const gameMapNamesDict = {
   "bigmap": customs_loot_map_data,
@@ -66,7 +115,6 @@ const gameMapNamesDict = {
   "factory4_day": factory_map_data,
   "factory4_night": factory_map_data
 };
-
 
 function init() {
   console.log("init() called");
@@ -86,34 +134,24 @@ function init() {
     })
   });
 
+  map.addOverlay(popup);
+
   map.on('click', function(event) {
     var point = event.coordinate;
 
-    // console.log("event.coordinate:", point);
     console.log(`${lastGamePosX} ${point[0]} ${lastGamePosZ} ${point[1]}`);
-
-    // playerIconFeature.getGeometry().setCoordinates(point);
-
-    // DEBUG STUFF BELOW
-    // lastGameMap = 'TarkovStreets';
-    // lastGameRot = 90;
-    // lastGamePosX = -84.273;
-    // lastGamePosZ = 177.886;
-    // lastGamePosY = 1.41552567;
 
     console.log("Last Game Data:", lastGameMap, lastGameRot, lastGamePosX, lastGamePosZ, lastGamePosY);
 
-    // let x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].XCoefficients);
-    // let z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].ZCoefficients);
-
-    // console.log("Polynomial X:", x, "Z:", z);
-
-    // let testCoords = toLonLat(z, x, customProjection);
-
-    // Move the player marker
-    // playerIconFeature.getGeometry().setCoordinates([x, z]);
-
-    // playerIconFeature.getStyle().getImage().setRotation(lastGameRot * (Math.PI / 180));
+    const features = map.getFeaturesAtPixel(event.pixel, {
+      layerFilter: (layer) => layer === questVectorLayer
+    });
+    
+    if (features.length > 0) {
+      popup.show(event.coordinate, `<b>${features[0].questName}</b></br>${features[0].questDescription}`);
+    } else {
+      popup.hide();
+    }
   });
 
   // Player marker stuff
@@ -126,7 +164,7 @@ function init() {
       anchor: [0.5, 0.5],
       anchorXUnits: 'fraction',
       anchorYUnits: 'fraction',
-      src: '/images/circle_with_arrow.png',
+      src: '/images/plain-arrow.png',
       scale: 0.5
       // width: 10,
       // height: 10
@@ -147,10 +185,34 @@ function init() {
 
   map.addLayer(playerVectorLayer);
 
+  // Airdrop marker stuff  
+  airdropVectorSource = new VectorSource({
+    features: [],
+  });
+  
+  airdropVectorLayer = new VectorLayer({
+    source: airdropVectorSource,
+  });
+
+  airdropVectorLayer.setZIndex(99);
+
+  map.addLayer(airdropVectorLayer);
+
+  // Quest marker stuff  
+  questVectorSource = new VectorSource({
+    features: [],
+  });
+
+  questVectorLayer = new VectorLayer({
+    source: questVectorSource,
+  });
+
+  questVectorLayer.setZIndex(99);
+
+  map.addLayer(questVectorLayer);
+
   // Finally attempt to connect
   doConnect();
-
-  // changeMap("bigmap");
 
   mapOverlayImage = new ImageLayer({
     source: new Static({
@@ -210,6 +272,33 @@ function changeMap(mapName) {
   currentlyLoadedMap = mapName;
 }
 
+function addAirdropIcon(x, z) {
+  const newAirdropFeature = new Feature({
+    geometry: new Point([x, z]),
+  });
+
+  newAirdropFeature.setStyle(airdropIconStyle);
+
+  airdropVectorSource.addFeature(newAirdropFeature);
+
+  airdropFeatures.push(newAirdropFeature);
+}
+
+function addQuestIcon(x, z, name, description) {
+  const newQuestFeature = new Feature({
+    geometry: new Point([x, z]),
+  });
+
+  newQuestFeature.setStyle(questIconStyle);
+
+  newQuestFeature.questName = name;
+  newQuestFeature.questDescription = description;
+
+  questVectorSource.addFeature(newQuestFeature);
+
+  questFeatures.push(newQuestFeature);
+}
+
 function doConnect() {
   websocket = new WebSocket("ws://" + location.host + "/")
   websocket.onopen = function(evt) { onOpen(evt) }
@@ -226,8 +315,52 @@ function onMessage(evt) {
   lastGamePosX = incomingMessageJSON.playerPositionX;
   lastGamePosZ = incomingMessageJSON.playerPositionZ;
   lastGamePosY = incomingMessageJSON.playerPositionY;
+  lastQuests = incomingMessageJSON.quests;
 
-  if (enableLogging) console.log(lastGameMap, lastGameRot, lastGamePosX, lastGamePosZ, lastGamePosY);
+  if (incomingMessageJSON.quests.length === 0 && questFeatures.length > 0) {
+    // Remove the old quest icons as they might be disabled
+    questFeatures.forEach(item => {
+      questVectorSource.removeFeature(item);
+    });
+  }
+
+  // Quests
+  if (activeRaidCounter < incomingMessageJSON.raidCounter) {
+    // Remove the old quest icons
+    questFeatures.forEach(item => {
+      questVectorSource.removeFeature(item);
+    });
+
+    activeQuests = lastQuests;
+
+    // Add the new ones
+    activeQuests.forEach(item => {
+      let x = calculatePolynomialValue(item.Where.x, gameMapNamesDict[lastGameMap].XCoefficients);
+      let z = calculatePolynomialValue(item.Where.z, gameMapNamesDict[lastGameMap].ZCoefficients);
+
+      addQuestIcon(x, z, item.NameText, item.DescriptionText);
+    });
+  }
+
+  // Airdrops
+  if (activeRaidCounter < incomingMessageJSON.raidCounter) {
+    airdropFeatures.forEach(item => {
+      airdropVectorSource.removeFeature(item);
+    });
+
+    airdropFeatures = [];
+  }
+  
+  if (airdropFeatures.length < incomingMessageJSON.airdrops.length) {
+    const difference = incomingMessageJSON.airdrops.filter((element) => !airdropFeatures.includes(element));
+
+    difference.forEach(airdrop => {
+      let x = calculatePolynomialValue(airdrop.x, gameMapNamesDict[lastGameMap].XCoefficients);
+      let z = calculatePolynomialValue(airdrop.z, gameMapNamesDict[lastGameMap].ZCoefficients);
+
+      addAirdropIcon(x, z);
+    });
+  }
 
   if (currentlyLoadedMap !== lastGameMap) {
     changeMap(lastGameMap);
@@ -266,6 +399,8 @@ function onMessage(evt) {
   playerIconFeature.getStyle().getImage().setRotation((gameMapNamesDict[lastGameMap].MapRotation + lastGameRot) * (Math.PI / 180));
 
   if (shouldFollowPlayer) mapView.setCenter([x, z]);
+
+  activeRaidCounter = incomingMessageJSON.raidCounter;
 }
 
 function onOpen(evt) {

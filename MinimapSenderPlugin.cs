@@ -2,25 +2,35 @@ using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using JetBrains.Annotations;
-using NetCoreServer;
 using System.Net;
 using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace TechHappy.MinimapSender
 {
-    [BepInPlugin("com.techhappy.minimapsender", "TechHappy.MinimapSender", "1.0.0")]
+    [BepInPlugin("com.techhappy.minimapsender", "TechHappy.MinimapSender", "1.0.3")]
     public class MinimapSenderPlugin : BaseUnityPlugin
     {
         internal static ManualLogSource MinimapSenderLogger { get; private set; }
         internal static ConfigEntry<int> RefreshIntervalMillieconds { get; private set; }
         internal static ConfigEntry<int> DestinationPort { get; private set; }
+        internal static ConfigEntry<bool> ShowAirdrops { get; private set; }
+        internal static ConfigEntry<bool> ShowQuestMarkers { get; private set; }
         internal static MinimapServer _server;
+        internal static int raidCounter = 0;
+
+        // TODO: Move this to a better spot than a global
+        internal static List<Vector3> airdrops;
+
 
         [UsedImplicitly]
         private void Awake()
         {
             MinimapSenderLogger = Logger;
             MinimapSenderLogger.LogInfo("MinimapSender loaded");
+
+            airdrops = new List<Vector3>();
 
             const string configSection = "Map settings";
 
@@ -48,7 +58,31 @@ namespace TechHappy.MinimapSender
                 )
             );
 
+            ShowAirdrops = Config.Bind
+            (
+                configSection,
+                "Show Airdrops",
+                true,
+                new ConfigDescription
+                (
+                    "Should icons appear for airdrops?"
+                )
+            );
+
+            ShowQuestMarkers = Config.Bind
+            (
+                configSection,
+                "Show Quest Locations",
+                true,
+                new ConfigDescription
+                (
+                    "Should icons appear for quest spots?"
+                )
+            );
+
+            // Enable patches
             new MinimapSenderPatch().Enable();
+            new AirdropOnBoxLandPatch().Enable();
 
             try
             {

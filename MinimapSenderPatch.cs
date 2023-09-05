@@ -22,6 +22,9 @@ namespace TechHappy.MinimapSender
                 return;
             }
 
+            MinimapSenderPlugin.raidCounter++;
+            MinimapSenderPlugin.airdrops.Clear();
+
             gameWorld.gameObject.AddComponent<MinimapSenderController>();
         }
     }
