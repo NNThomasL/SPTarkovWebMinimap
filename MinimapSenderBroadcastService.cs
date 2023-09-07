@@ -92,27 +92,30 @@ namespace TechHappy.MinimapSender
         {
             try
             {
-                string mapName = _gamePlayerOwner.Player.Location;
-                Vector3 playerPosition = _gamePlayerOwner.Player.Position;
-                Vector2 playerRotation = _gamePlayerOwner.Player.Rotation;
-                Vector3[] airdrops = { };
-
-                if (MinimapSenderPlugin.ShowAirdrops.Value == true)
+                if (_gamePlayerOwner.Player != null)
                 {
-                    airdrops = MinimapSenderPlugin.airdrops.ToArray();
+                    string mapName = _gamePlayerOwner.Player.Location;
+                    Vector3 playerPosition = _gamePlayerOwner.Player.Position;
+                    Vector2 playerRotation = _gamePlayerOwner.Player.Rotation;
+                    Vector3[] airdrops = { };
+
+                    if (MinimapSenderPlugin.ShowAirdrops.Value == true)
+                    {
+                        airdrops = MinimapSenderPlugin.airdrops.ToArray();
+                    }
+
+                    MinimapSenderPlugin._server.MulticastText(JsonConvert.SerializeObject(new
+                    {
+                        raidCounter = MinimapSenderPlugin.raidCounter,
+                        mapName = mapName,
+                        playerRotationX = playerRotation.x,
+                        playerPositionX = playerPosition.x,
+                        playerPositionZ = playerPosition.z,
+                        playerPositionY = playerPosition.y,
+                        airdrops = airdrops,
+                        quests = MinimapSenderPlugin.ShowQuestMarkers.Value ? _quests : new List<QuestMarkerInfo>() { }
+                    }));
                 }
-
-                MinimapSenderPlugin._server.MulticastText(JsonConvert.SerializeObject(new
-                {
-                    raidCounter = MinimapSenderPlugin.raidCounter,
-                    mapName = mapName,
-                    playerRotationX = playerRotation.x,
-                    playerPositionX = playerPosition.x,
-                    playerPositionZ = playerPosition.z,
-                    playerPositionY = playerPosition.y,
-                    airdrops = airdrops,
-                    quests = MinimapSenderPlugin.ShowQuestMarkers.Value ? _quests : new List<QuestMarkerInfo>() { }
-                }));
             }
             catch (Exception e)
             {

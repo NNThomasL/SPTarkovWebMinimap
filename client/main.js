@@ -84,7 +84,7 @@ const questIconStyle = new Style({
     anchor: [0.5, 0.5],
     anchorXUnits: 'fraction',
     anchorYUnits: 'fraction',
-    src: '/images/contract-with-background.png',
+    src: '/images/check-mark.png',
     scale: 0.5
     // width: 10,
     // height: 10
@@ -325,7 +325,7 @@ function onMessage(evt) {
   }
 
   // Quests
-  if (activeRaidCounter < incomingMessageJSON.raidCounter) {
+  if (activeRaidCounter < incomingMessageJSON.raidCounter && lastGameMap != "factory4_day" && lastGameMap != "factory4_night") {
     // Remove the old quest icons
     questFeatures.forEach(item => {
       questVectorSource.removeFeature(item);

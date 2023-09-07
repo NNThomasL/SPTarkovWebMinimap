@@ -19,8 +19,6 @@ namespace TechHappy.MinimapSender
 
             MethodInfo onBoxLandMethod = typeof(AirdropBox).GetMethod("OnBoxLand", BindingFlags.NonPublic | BindingFlags.Instance);
 
-            MinimapSenderPlugin.MinimapSenderLogger.LogInfo($"onBoxLandMethod = {onBoxLandMethod.Name}");
-
             return typeof(AirdropBox).GetMethod("OnBoxLand", BindingFlags.NonPublic | BindingFlags.Instance);
         }
 

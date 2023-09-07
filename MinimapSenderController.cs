@@ -363,7 +363,7 @@ public class ZoneData
 
     public void AddTriggers(IEnumerable<TriggerWithId> allTriggers)
     {
-        MinimapSenderPlugin.MinimapSenderLogger.LogError($"AddTriggers()");
+        //MinimapSenderPlugin.MinimapSenderLogger.LogError($"AddTriggers()");
 
         TriggerPoints.AddRange(allTriggers);
     }
