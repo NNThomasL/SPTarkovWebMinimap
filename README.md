@@ -13,7 +13,9 @@ You can also open the map on a mobile device using the same URL but replacing 'l
 
 Hit the '🧭' on the top left of the map to enable follow mode.
 
-Here is the latest [VirusTotal scan (Release 1.0.1 of project)](https://www.virustotal.com/gui/file/5f1da8b87fcc494ea4e99149e7244e44f2df61fab9c2bc85f1180d44bebae023?nocache=1). If you are worried about security, I ask that you check and compile the code yourself. The project is pretty small so it should be a quick read and simple compile/bundle.
+Quest markers will show quest info on click.
+
+Here is the latest [VirusTotal scan (Release 1.0.3 of project)](https://www.virustotal.com/gui/file/ed1f80d208c53e1b4911f02423336c5b247b54396464697c90e2b9e90e26e087?nocache=1). If you are worried about security, I ask that you check and compile the code yourself. The project is pretty small so it should be a quick read and simple compile/bundle.
 
 
 
