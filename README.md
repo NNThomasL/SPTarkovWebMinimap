@@ -43,6 +43,9 @@ Here is the latest [VirusTotal scan (Release 1.0.3 of project)](https://www.viru
 - Shoreline Health Resort interior map
 - Possibly modify the Woods map to line up cache spots with my coordinates
 - Make it so that the index.html is not needed in the connect URL
+- Cache icons that show picture of location when clicked?
+- Button in F12 menu to open the web page
+- QR code on desktop browser for connecting mobile device
 
 ### Notes:
 This is my first SPTarkov mod and it is very messy. I will clean up the code in the near future but I am currently focusing on how it functions before I worry about maintenance. Silly of me but that is how I work.

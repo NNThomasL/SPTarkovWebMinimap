@@ -27,6 +27,7 @@ import interchange_map_data from './map_data/interchange_map_modified_data.json'
 import reserve_map_data from './map_data/reserve_map_data.json';
 import laboratory_loot_map_data from './map_data/laboratory_loot_map_modified_data.json';
 import factory_map_data from './map_data/factory_map_data.json';
+import customs_test_map_data from './map_data/customs_test_map_data.json'
 
 let websocket;
 
@@ -54,6 +55,9 @@ let airdropFeatures = [];
 let questVectorLayer;
 let questVectorSource;
 let questFeatures = [];
+let cacheVectorLayer;
+let cacheVectorSource;
+let cacheFeatures = [];
 let questPopoverOverlay;
 let selectedFeature;
 
@@ -91,6 +95,18 @@ const questIconStyle = new Style({
   })
 });
 
+const cacheIconStyle = new Style({
+  image: new Icon({
+    anchor: [0.5, 0.5],
+    anchorXUnits: 'fraction',
+    anchorYUnits: 'fraction',
+    src: '/images/convergence-target.png',
+    scale: 0.5
+    // width: 10,
+    // height: 10
+  })
+});
+
 let shouldFollowPlayer = false;
 
 let activeRaidCounter = 0;
@@ -104,7 +120,7 @@ let lastQuests = [];
 let activeQuests = [];
 
 const gameMapNamesDict = {
-  "bigmap": customs_loot_map_data,
+  "bigmap": customs_loot_map_data, // Changed to test for now
   "TarkovStreets": streets_of_tarkov_map_data,
   "Woods": woods_map_data,
   "Lighthouse": lighthouse_loot_map_data,
@@ -116,15 +132,18 @@ const gameMapNamesDict = {
   "factory4_night": factory_map_data
 };
 
+/**
+ * Initializes the map object with custom controls, interactions, and projection.
+ * Also adds overlays and layers for quest, cache, player, airdrop markers, and map image.
+ * Finally, attempts to connect to the SPT client and sets the view for the map.
+ */
 function init() {
   console.log("init() called");
-  const mousePositionControl = new MousePosition({
-    projection: customProjection,
-  });
 
+  // Create the map object with the interaction controls and the custom projection
   map = new Map({
     target: 'map',
-    controls: defaultControls().extend([new FollowPlayerControl()]), // mousePositionControl
+    controls: defaultControls().extend([new FollowPlayerControl()]),
     interactions: defaultInteractions({altShiftDragRotate:false, pinchRotate:false}),
     view: new View({
       projection: customProjection,
@@ -134,24 +153,43 @@ function init() {
     })
   });
 
+  // Add the quest and cache popup overlay
   map.addOverlay(popup);
 
+  // When the map is clicked, check if there is a quest or cache marker and if so, show the correct popup
   map.on('click', function(event) {
     var point = event.coordinate;
 
+    // This is for debugging the polynomial calculations
+    // Copy this line of text from the console and put it into the EFT Map desktop program in the "Map Creation Mode"'s map positions text box
     console.log(`${lastGamePosX} ${point[0]} ${lastGamePosZ} ${point[1]}`);
 
-    console.log("Last Game Data:", lastGameMap, lastGameRot, lastGamePosX, lastGamePosZ, lastGamePosY);
-
-    const features = map.getFeaturesAtPixel(event.pixel, {
+    // Check if there is a quest marker at the clicked location
+    const questFeatures = map.getFeaturesAtPixel(event.pixel, {
       layerFilter: (layer) => layer === questVectorLayer
     });
+
+    // Check if there is a cache marker at the clicked location
+    const cacheFeatures = map.getFeaturesAtPixel(event.pixel, {
+      layerFilter: (layer) => layer === cacheVectorLayer
+    });
     
-    if (features.length > 0) {
-      popup.show(event.coordinate, `<b>${features[0].questName}</b></br>${features[0].questDescription}`);
-    } else {
-      popup.hide();
+    // Show the quest info popup if there is a quest marker
+    if (questFeatures.length > 0) {
+      popup.show(event.coordinate, `<b>${questFeatures[0].questName}</b></br>${questFeatures[0].questDescription}`);
+
+      return;
+    } 
+    
+    // Show the cache info popup if there is a cache marker
+    if (cacheFeatures.length > 0) {
+      popup.show(event.coordinate, `<b>Cache</b></br><img src="/images/${cacheFeatures[0].cacheImage}" width="200" height="200"></br>${cacheFeatures[0].cacheHint}`);
+
+      return;
     }
+    
+    // Otherwise hide the popup
+    popup.hide();
   });
 
   // Player marker stuff
@@ -194,7 +232,7 @@ function init() {
     source: airdropVectorSource,
   });
 
-  airdropVectorLayer.setZIndex(99);
+  airdropVectorLayer.setZIndex(98);
 
   map.addLayer(airdropVectorLayer);
 
@@ -207,13 +245,27 @@ function init() {
     source: questVectorSource,
   });
 
-  questVectorLayer.setZIndex(99);
+  questVectorLayer.setZIndex(98);
 
   map.addLayer(questVectorLayer);
 
-  // Finally attempt to connect
+  // Cache marker stuff  
+  cacheVectorSource = new VectorSource({
+    features: [],
+  });
+
+  cacheVectorLayer = new VectorLayer({
+    source: cacheVectorSource,
+  });
+
+  cacheVectorLayer.setZIndex(98);
+
+  map.addLayer(cacheVectorLayer);
+
+  // Finally attempt to connect to the SPT client
   doConnect();
 
+  // Load the default "Enter a raid" image
   mapOverlayImage = new ImageLayer({
     source: new Static({
       url: `/maps/enter_a_raid.png`,
@@ -224,6 +276,7 @@ function init() {
 
   map.addLayer(mapOverlayImage);
 
+  // Configure the view for the "Enter a raid" image
   mapView = new View({
     projection: customProjection,
     center: [-100, -100, 700, 500],
@@ -236,13 +289,16 @@ function init() {
   map.setView(mapView);
 }
 
+
 function changeMap(mapName) {
   console.log("Changing map to:", mapName);
 
+  // Remove the old map image
   if (mapOverlayImage) {
     map.removeLayer(mapOverlayImage);
   }
 
+  // Load the new map image
   mapOverlayImage = new ImageLayer({
     source: new Static({
       url: `/maps/${gameMapNamesDict[mapName].MapImageFile}`,
@@ -251,8 +307,10 @@ function changeMap(mapName) {
     }),
   }),
 
+  // Add the image to the map
   map.addLayer(mapOverlayImage);
 
+  // Set the view limits to the image bounds +/- 10%
   viewExtent = [gameMapNamesDict[mapName].bounds[2] * -0.1, gameMapNamesDict[mapName].bounds[2] * -0.1, gameMapNamesDict[mapName].bounds[2] * 1.1, gameMapNamesDict[mapName].bounds[3] * 1.1]; // TODO: Instead of a fixed increase, multiply the normal bound size by ~1.1x
 
   mapView = new View({
@@ -267,11 +325,33 @@ function changeMap(mapName) {
   mapView.fit(viewExtent, map.getSize()); 
 
   map.setView(mapView);
-  
+
+
+  // Remove the old cache icons
+  cacheFeatures.forEach(item => {
+    cacheVectorSource.removeFeature(item);
+  });
+
+  cacheFeatures = [];
+
+  // Add the new ones
+  // gameMapNamesDict[mapName].caches?.forEach(item => {
+  //   let x = calculatePolynomialValue(item.x, gameMapNamesDict[mapName].XCoefficients);
+  //   let z = calculatePolynomialValue(item.z, gameMapNamesDict[mapName].ZCoefficients);
+  //   let image = item.image;
+  //   let hint = item.hint;
+
+  //   addCacheIcon(x, z, image, hint);
+  // });  
 
   currentlyLoadedMap = mapName;
 }
 
+/**
+ * Adds a new airdrop icon to the map.
+ * @param {number} x - The x coordinate of the airdrop icon.
+ * @param {number} z - The z coordinate of the airdrop icon.
+ */
 function addAirdropIcon(x, z) {
   const newAirdropFeature = new Feature({
     geometry: new Point([x, z]),
@@ -284,6 +364,13 @@ function addAirdropIcon(x, z) {
   airdropFeatures.push(newAirdropFeature);
 }
 
+/**
+ * Adds a new quest icon to the map.
+ * @param {number} x - The x coordinate of the quest icon.
+ * @param {number} z - The z coordinate of the quest icon.
+ * @param {string} name - The name of the quest.
+ * @param {string} description - The description of the quest.
+ */
 function addQuestIcon(x, z, name, description) {
   const newQuestFeature = new Feature({
     geometry: new Point([x, z]),
@@ -299,6 +386,33 @@ function addQuestIcon(x, z, name, description) {
   questFeatures.push(newQuestFeature);
 }
 
+/**
+ * Adds a cache icon to the map at the specified coordinates.
+ * @param {number} x - The x coordinate of the cache icon.
+ * @param {number} z - The z coordinate of the cache icon.
+ * @param {string} image - The image to use for the cache hint image.
+ * @param {string} hint - The hint to display when the cache icon is clicked.
+ */
+function addCacheIcon(x, z, image, hint) {
+  const newCacheFeature = new Feature({
+    geometry: new Point([x, z]),
+  });
+
+  newCacheFeature.setStyle(cacheIconStyle);
+
+  newCacheFeature.cacheImage = image;
+  newCacheFeature.cacheHint = hint;
+
+  cacheVectorSource.addFeature(newCacheFeature);
+
+  cacheFeatures.push(newCacheFeature);
+}
+
+/**
+ * Establishes a WebSocket connection to the SPT client mod's web server.
+ * @function
+ * @returns {void}
+ */
 function doConnect() {
   websocket = new WebSocket("ws://" + location.host + "/")
   websocket.onopen = function(evt) { onOpen(evt) }
@@ -307,6 +421,10 @@ function doConnect() {
   websocket.onerror = function (evt) { onError(evt) }
 }
 
+/**
+ * Handles incoming messages from the server and updates the game map accordingly.
+ * @param {MessageEvent} evt - The message event containing the incoming message data.
+ */
 function onMessage(evt) {
   let incomingMessageJSON = JSON.parse(evt.data);
 
@@ -325,6 +443,7 @@ function onMessage(evt) {
   }
 
   // Quests
+  // Remove the old quest icons on new raid start and create icons for the new quests
   if (activeRaidCounter < incomingMessageJSON.raidCounter && lastGameMap != "factory4_day" && lastGameMap != "factory4_night") {
     // Remove the old quest icons
     questFeatures.forEach(item => {
@@ -343,6 +462,7 @@ function onMessage(evt) {
   }
 
   // Airdrops
+  // Remove the old airdrop icons on new raid start
   if (activeRaidCounter < incomingMessageJSON.raidCounter) {
     airdropFeatures.forEach(item => {
       airdropVectorSource.removeFeature(item);
@@ -351,6 +471,7 @@ function onMessage(evt) {
     airdropFeatures = [];
   }
   
+  // Add the new airdop icon when a new airdrop is detected
   if (airdropFeatures.length < incomingMessageJSON.airdrops.length) {
     const difference = incomingMessageJSON.airdrops.filter((element) => !airdropFeatures.includes(element));
 
@@ -362,13 +483,17 @@ function onMessage(evt) {
     });
   }
 
+  // Change the map if the player has loaded into a new map
   if (currentlyLoadedMap !== lastGameMap) {
     changeMap(lastGameMap);
   }
 
+  // Get the calculated x and z coordinates for the player marker
   let x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].XCoefficients);
   let z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].ZCoefficients);
 
+  
+  // Special cases for maps that have multiple floors
   if (lastGameMap == "Interchange") {
     // Main mall bounding box + Goshan extension
     if ((lastGamePosX < 83 && lastGamePosX > -157.8 && lastGamePosZ < 193.2 && lastGamePosZ > -303.87) || (lastGamePosX < -157.8 && lastGamePosX > -183.4 && lastGamePosZ < 69 && lastGamePosZ > -178.66)) {

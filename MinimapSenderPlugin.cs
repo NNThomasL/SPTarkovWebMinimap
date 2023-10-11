@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace TechHappy.MinimapSender
 {
-    [BepInPlugin("com.techhappy.minimapsender", "TechHappy.MinimapSender", "1.0.3")]
+    [BepInPlugin("com.techhappy.webminimap", "TechHappy.WebMinimap", "1.0.4")]
     public class MinimapSenderPlugin : BaseUnityPlugin
     {
         internal static ManualLogSource MinimapSenderLogger { get; private set; }

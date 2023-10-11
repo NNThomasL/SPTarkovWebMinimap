@@ -1,14 +1,14 @@
 {
   "MapName": "Streets Of Tarkov",
-  "MapImageFile": "streets_of_tarkov_map.png",
+  "MapImageFile": "streets_of_tarkov_map_3.7.0.webp",
   "MapRotation": 0,
   "XCoefficients": [
-    3119.3090195858717,
-    -6.148928964345941
+    3603.684637862307,
+    -5.275692753940095
   ],
   "ZCoefficients": [
-    3788.869888092795,
-    -6.143341155368058
+    3106.2785491440463,
+    -5.032259429266355
   ],
   "bounds": [ 0, 0, 6539, 4394 ],
   "initialZoom": 3

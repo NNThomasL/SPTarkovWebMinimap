@@ -82,6 +82,7 @@ namespace TechHappy.MinimapSender
 
         public void Update()
         {
+            //// TODO: Comment the code below before release
             //if (Input.GetKeyUp(KeyCode.Backslash))
             //{
             //    MinimapSenderPlugin.MinimapSenderLogger.LogInfo("Backslash was pressed");

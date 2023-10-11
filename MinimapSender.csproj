@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net472</TargetFramework>
-		<Version>1.0.3</Version>
+		<Version>1.0.4</Version>
 		<Authors>TechHappy</Authors>
 		<AssemblyName>TechHappy.$(MSBuildProjectName)</AssemblyName>
 		<RootNamespace>TechHappy.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
