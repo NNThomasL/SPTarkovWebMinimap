@@ -576,7 +576,8 @@ class FollowPlayerControl extends Control {
     const options = opt_options || {};
 
     const button = document.createElement('button');
-    button.innerHTML = '🧭';
+    button.innerHTML = 'Follow Player';
+    button.className = 'custom-control-button';
 
     const element = document.createElement('div');
     element.className = 'follow-player ol-unselectable ol-control';
@@ -604,7 +605,8 @@ class QRCodeControl extends Control {
     const options = opt_options || {};
 
     const button = document.createElement('button');
-    button.innerHTML = '📲';
+    button.innerHTML = 'QR Code';
+    button.className = 'custom-control-button';
 
     const element = document.createElement('div');
     element.className = 'qr-code-button ol-unselectable ol-control';

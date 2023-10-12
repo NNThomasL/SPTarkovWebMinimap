@@ -13,9 +13,14 @@ html, body {
   width: 100%;
 }
 
+.custom-control-button {
+  width: fit-content !important;
+}
+
 .follow-player {
   top: 65px;
   left: .5em;
+  
 }
 .ol-touch .follow-player {
   top: 80px;
