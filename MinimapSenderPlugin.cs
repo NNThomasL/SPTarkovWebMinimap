@@ -10,7 +10,7 @@ using System.Diagnostics;
 
 namespace TechHappy.MinimapSender
 {
-    [BepInPlugin("com.techhappy.webminimap", "TechHappy.WebMinimap", "1.0.4")]
+    [BepInPlugin("com.techhappy.webminimap", "TechHappy.WebMinimap", "1.0.5")]
     public class MinimapSenderPlugin : BaseUnityPlugin
     {
         internal static ManualLogSource MinimapSenderLogger { get; private set; }
