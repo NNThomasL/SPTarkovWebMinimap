@@ -6,6 +6,7 @@ using System.Net;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Diagnostics;
 
 namespace TechHappy.MinimapSender
 {
@@ -13,7 +14,8 @@ namespace TechHappy.MinimapSender
     public class MinimapSenderPlugin : BaseUnityPlugin
     {
         internal static ManualLogSource MinimapSenderLogger { get; private set; }
-        internal static ConfigEntry<int> RefreshIntervalMillieconds { get; private set; }
+        internal static ConfigEntry<bool> OpenMapToggle { get ; private set; }
+        internal static ConfigEntry<int> RefreshIntervalMilliseconds { get; private set; }
         internal static ConfigEntry<int> DestinationPort { get; private set; }
         internal static ConfigEntry<bool> ShowAirdrops { get; private set; }
         internal static ConfigEntry<bool> ShowQuestMarkers { get; private set; }
@@ -32,9 +34,24 @@ namespace TechHappy.MinimapSender
 
             airdrops = new List<Vector3>();
 
-            const string configSection = "Map settings";
+            const string configSectionHelpers = "Helpers";
 
-            RefreshIntervalMillieconds = Config.Bind
+            OpenMapToggle = Config.Bind
+            (
+                configSectionHelpers,
+                "Open Map",
+                false,
+                new ConfigDescription
+                (
+                    "Opens the map when toggled on"
+                )
+            );
+
+            const string configSection = "Map settings";            
+
+            OpenMapToggle.SettingChanged += OpenMapSettingChanged;
+
+            RefreshIntervalMilliseconds = Config.Bind
             (
                 configSection,
                 "Refresh Interval (milliseconds)",
@@ -111,5 +128,16 @@ namespace TechHappy.MinimapSender
             }
         }
 
+        static void OpenMapSettingChanged(object sender, EventArgs e)
+        {
+            MinimapSenderLogger.LogInfo($"OpenMap setting changed");
+
+            if (OpenMapToggle.Value == true)
+            {
+                OpenMapToggle.Value = false;
+
+                Process.Start($"http://localhost:{DestinationPort.Value}/index.html");
+            }
+        }
     }
 }

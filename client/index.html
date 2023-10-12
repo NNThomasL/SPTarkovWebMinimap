@@ -4,21 +4,16 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/x-icon" href="https://openlayers.org/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
+      integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
     <title>SPTarkov Web Minimap</title>
   </head>
   <body onload="init()">
     <div id="map"></div>
-    <div id="popup" style="display: none;">
-      <div class="popover__wrapper">
-        <a href="#">
-          <h2 class="popover__title">Hover:me</h2>
-        </a>
-        <div class="popover__content">
-          <p class="popover__message">Joseph Francis "Joey" Tribbiani, Jr.</p>
-          <img alt="Joseph Francis Joey Tribbiani, Jr." src="https://media.giphy.com/media/11SIBu3s72Co8w/giphy.gif">
-        </div>
-      </div>
-    </div>
 
     <script type="module" src="./main.js"></script>
   </body>

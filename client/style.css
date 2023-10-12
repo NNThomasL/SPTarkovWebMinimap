@@ -21,6 +21,14 @@ html, body {
   top: 80px;
 }
 
+.qr-code-button {
+  top: 100px;
+  left: .5em;
+}
+.ol-touch .qr-code-button {
+  top: 115px;
+}
+
 /* Popover styling */
 
 a {

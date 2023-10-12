@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Text;
 using System.Timers;
 using Aki.Reflection.Utils;
@@ -94,6 +95,7 @@ namespace TechHappy.MinimapSender
             {
                 if (_gamePlayerOwner.Player != null)
                 {
+                    string msgType = "mapData";
                     string mapName = _gamePlayerOwner.Player.Location;
                     Vector3 playerPosition = _gamePlayerOwner.Player.Position;
                     Vector2 playerRotation = _gamePlayerOwner.Player.Rotation;
@@ -106,6 +108,7 @@ namespace TechHappy.MinimapSender
 
                     MinimapSenderPlugin._server.MulticastText(JsonConvert.SerializeObject(new
                     {
+                        msgType = msgType,
                         raidCounter = MinimapSenderPlugin.raidCounter,
                         mapName = mapName,
                         playerRotationX = playerRotation.x,
@@ -154,7 +157,38 @@ class WebsocketSession : WsSession
     public override void OnWsReceived(byte[] buffer, long offset, long size)
     {
         string message = Encoding.UTF8.GetString(buffer, (int)offset, (int)size);
-        MinimapSenderPlugin.MinimapSenderLogger.LogInfo("Incoming: " + message);
+        //MinimapSenderPlugin.MinimapSenderLogger.LogInfo("Incoming: " + message);
+
+        var values = JsonConvert.DeserializeObject<Dictionary<string, string>>(message);
+
+        //MinimapSenderPlugin.MinimapSenderLogger.LogInfo(values["type"]);
+
+        if (values["type"] != null && values["type"] == "get_connect_address")
+        {
+            //string hostName = Dns.GetHostName(); // Retrive the Name of HOST
+            //var addressList = Dns.GetHostEntry(hostName);
+
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    //MinimapSenderPlugin.MinimapSenderLogger.LogInfo("IP Address = " + ip.ToString());
+
+                    string msgType = "connectAddress";
+
+                    MinimapSenderPlugin._server.MulticastText(JsonConvert.SerializeObject(new
+                    {
+                        msgType = msgType,
+                        ipAddress = ip.ToString(),
+                    }));
+
+                    break;
+                }
+            }
+
+            
+        }
     }
 
     protected override void OnError(SocketError error)

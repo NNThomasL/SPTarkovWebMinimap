@@ -39,7 +39,7 @@ namespace TechHappy.MinimapSender
 
                 var gamePlayerOwner = GetLocalPlayerFromWorld().GetComponentInChildren<GamePlayerOwner>();
 
-                MinimapSenderPlugin.RefreshIntervalMillieconds.SettingChanged += RefreshIntervalSecondsOnSettingChanged;
+                MinimapSenderPlugin.RefreshIntervalMilliseconds.SettingChanged += RefreshIntervalSecondsOnSettingChanged;
 
                 if (_minimapSenderService == null)
                 {
@@ -61,7 +61,7 @@ namespace TechHappy.MinimapSender
                 //    MinimapSenderPlugin.MinimapSenderLogger.LogInfo($"QuestMarker: {_localizedHelper.Localized(questMarkerData.NameKey)} Position: {questMarkerData.Where.x}, {questMarkerData.Where.z} Neccessary: {!questMarkerData.IsNotNecessary}");
                 //}
 
-                _minimapSenderService.StartBroadcastingPosition(MinimapSenderPlugin.RefreshIntervalMillieconds.Value);
+                _minimapSenderService.StartBroadcastingPosition(MinimapSenderPlugin.RefreshIntervalMilliseconds.Value);
             }
             catch (Exception e)
             {
@@ -71,7 +71,7 @@ namespace TechHappy.MinimapSender
 
         private void RefreshIntervalSecondsOnSettingChanged(object sender, EventArgs e)
         {
-            _minimapSenderService.ChangeInterval(MinimapSenderPlugin.RefreshIntervalMillieconds.Value);
+            _minimapSenderService.ChangeInterval(MinimapSenderPlugin.RefreshIntervalMilliseconds.Value);
         }
 
         [UsedImplicitly]

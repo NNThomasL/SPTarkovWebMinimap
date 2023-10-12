@@ -143,7 +143,7 @@ function init() {
   // Create the map object with the interaction controls and the custom projection
   map = new Map({
     target: 'map',
-    controls: defaultControls().extend([new FollowPlayerControl()]),
+    controls: defaultControls().extend([new FollowPlayerControl(), new QRCodeControl()]),
     interactions: defaultInteractions({altShiftDragRotate:false, pinchRotate:false}),
     view: new View({
       projection: customProjection,
@@ -428,104 +428,121 @@ function doConnect() {
 function onMessage(evt) {
   let incomingMessageJSON = JSON.parse(evt.data);
 
-  lastGameMap = incomingMessageJSON.mapName;
-  lastGameRot = incomingMessageJSON.playerRotationX;
-  lastGamePosX = incomingMessageJSON.playerPositionX;
-  lastGamePosZ = incomingMessageJSON.playerPositionZ;
-  lastGamePosY = incomingMessageJSON.playerPositionY;
-  lastQuests = incomingMessageJSON.quests;
+  if (incomingMessageJSON.msgType == "mapData") {  
+    lastGameMap = incomingMessageJSON.mapName;
+    lastGameRot = incomingMessageJSON.playerRotationX;
+    lastGamePosX = incomingMessageJSON.playerPositionX;
+    lastGamePosZ = incomingMessageJSON.playerPositionZ;
+    lastGamePosY = incomingMessageJSON.playerPositionY;
+    lastQuests = incomingMessageJSON.quests;
 
-  if (incomingMessageJSON.quests.length === 0 && questFeatures.length > 0) {
-    // Remove the old quest icons as they might be disabled
-    questFeatures.forEach(item => {
-      questVectorSource.removeFeature(item);
-    });
-  }
+    if (incomingMessageJSON.quests.length === 0 && questFeatures.length > 0) {
+      // Remove the old quest icons as they might be disabled
+      questFeatures.forEach(item => {
+        questVectorSource.removeFeature(item);
+      });
+    }
 
-  // Quests
-  // Remove the old quest icons on new raid start and create icons for the new quests
-  if (activeRaidCounter < incomingMessageJSON.raidCounter && lastGameMap != "factory4_day" && lastGameMap != "factory4_night") {
-    // Remove the old quest icons
-    questFeatures.forEach(item => {
-      questVectorSource.removeFeature(item);
-    });
+    // Quests
+    // Remove the old quest icons on new raid start and create icons for the new quests
+    if (activeRaidCounter < incomingMessageJSON.raidCounter && lastGameMap != "factory4_day" && lastGameMap != "factory4_night") {
+      // Remove the old quest icons
+      questFeatures.forEach(item => {
+        questVectorSource.removeFeature(item);
+      });
 
-    activeQuests = lastQuests;
+      activeQuests = lastQuests;
 
-    // Add the new ones
-    activeQuests.forEach(item => {
-      let x = calculatePolynomialValue(item.Where.x, gameMapNamesDict[lastGameMap].XCoefficients);
-      let z = calculatePolynomialValue(item.Where.z, gameMapNamesDict[lastGameMap].ZCoefficients);
+      // Add the new ones
+      activeQuests.forEach(item => {
+        let x = calculatePolynomialValue(item.Where.x, gameMapNamesDict[lastGameMap].XCoefficients);
+        let z = calculatePolynomialValue(item.Where.z, gameMapNamesDict[lastGameMap].ZCoefficients);
 
-      addQuestIcon(x, z, item.NameText, item.DescriptionText);
-    });
-  }
+        addQuestIcon(x, z, item.NameText, item.DescriptionText);
+      });
+    }
 
-  // Airdrops
-  // Remove the old airdrop icons on new raid start
-  if (activeRaidCounter < incomingMessageJSON.raidCounter) {
-    airdropFeatures.forEach(item => {
-      airdropVectorSource.removeFeature(item);
-    });
+    // Airdrops
+    // Remove the old airdrop icons on new raid start
+    if (activeRaidCounter < incomingMessageJSON.raidCounter) {
+      airdropFeatures.forEach(item => {
+        airdropVectorSource.removeFeature(item);
+      });
 
-    airdropFeatures = [];
-  }
-  
-  // Add the new airdop icon when a new airdrop is detected
-  if (airdropFeatures.length < incomingMessageJSON.airdrops.length) {
-    const difference = incomingMessageJSON.airdrops.filter((element) => !airdropFeatures.includes(element));
+      airdropFeatures = [];
+    }
+    
+    // Add the new airdop icon when a new airdrop is detected
+    if (airdropFeatures.length < incomingMessageJSON.airdrops.length) {
+      const difference = incomingMessageJSON.airdrops.filter((element) => !airdropFeatures.includes(element));
 
-    difference.forEach(airdrop => {
-      let x = calculatePolynomialValue(airdrop.x, gameMapNamesDict[lastGameMap].XCoefficients);
-      let z = calculatePolynomialValue(airdrop.z, gameMapNamesDict[lastGameMap].ZCoefficients);
+      difference.forEach(airdrop => {
+        let x = calculatePolynomialValue(airdrop.x, gameMapNamesDict[lastGameMap].XCoefficients);
+        let z = calculatePolynomialValue(airdrop.z, gameMapNamesDict[lastGameMap].ZCoefficients);
 
-      addAirdropIcon(x, z);
-    });
-  }
+        addAirdropIcon(x, z);
+      });
+    }
 
-  // Change the map if the player has loaded into a new map
-  if (currentlyLoadedMap !== lastGameMap) {
-    changeMap(lastGameMap);
-  }
+    // Change the map if the player has loaded into a new map
+    if (currentlyLoadedMap !== lastGameMap) {
+      changeMap(lastGameMap);
+    }
 
-  // Get the calculated x and z coordinates for the player marker
-  let x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].XCoefficients);
-  let z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].ZCoefficients);
+    // Get the calculated x and z coordinates for the player marker
+    let x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].XCoefficients);
+    let z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].ZCoefficients);
 
-  
-  // Special cases for maps that have multiple floors
-  if (lastGameMap == "Interchange") {
-    // Main mall bounding box + Goshan extension
-    if ((lastGamePosX < 83 && lastGamePosX > -157.8 && lastGamePosZ < 193.2 && lastGamePosZ > -303.87) || (lastGamePosX < -157.8 && lastGamePosX > -183.4 && lastGamePosZ < 69 && lastGamePosZ > -178.66)) {
-      if (lastGamePosY < 23) { // Parking garage
-        x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].ParkingGarageXCoefficients);
-        z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].ParkingGarageZCoefficients);
-      } else if (lastGamePosY > 32) { // Floor 2
-        x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].InteriorFloor2XCoefficients);
-        z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].InteriorFloor2ZCoefficients);
+    
+    // Special cases for maps that have multiple floors
+    if (lastGameMap == "Interchange") {
+      // Main mall bounding box + Goshan extension
+      if ((lastGamePosX < 83 && lastGamePosX > -157.8 && lastGamePosZ < 193.2 && lastGamePosZ > -303.87) || (lastGamePosX < -157.8 && lastGamePosX > -183.4 && lastGamePosZ < 69 && lastGamePosZ > -178.66)) {
+        if (lastGamePosY < 23) { // Parking garage
+          x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].ParkingGarageXCoefficients);
+          z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].ParkingGarageZCoefficients);
+        } else if (lastGamePosY > 32) { // Floor 2
+          x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].InteriorFloor2XCoefficients);
+          z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].InteriorFloor2ZCoefficients);
+        }
       }
+    } else if (lastGameMap == "laboratory") {
+      if (lastGamePosY > 3) {
+        x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].Floor2XCoefficients);
+        z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].Floor2ZCoefficients);
+      } else if (lastGamePosY < -2) {
+        x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].TechnicalLevelXCoefficients);
+        z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].TechnicalLevelZCoefficients);
+      }
+    } else if (lastGameMap == "factory4_day" || lastGameMap == "factory4_night") {
+      // This map doesn't work
+      x = 0;
+      z = 0;
     }
-  } else if (lastGameMap == "laboratory") {
-    if (lastGamePosY > 3) {
-      x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].Floor2XCoefficients);
-      z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].Floor2ZCoefficients);
-    } else if (lastGamePosY < -2) {
-      x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].TechnicalLevelXCoefficients);
-      z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].TechnicalLevelZCoefficients);
-    }
-  } else if (lastGameMap == "factory4_day" || lastGameMap == "factory4_night") {
-    // This map doesn't work
-    x = 0;
-    z = 0;
+
+    // Move the player marker
+    playerIconFeature.getGeometry().setCoordinates([x, z]);
+    playerIconFeature.getStyle().getImage().setRotation((gameMapNamesDict[lastGameMap].MapRotation + lastGameRot) * (Math.PI / 180));
+
+    if (shouldFollowPlayer) mapView.setCenter([x, z]);
+
+    activeRaidCounter = incomingMessageJSON.raidCounter;
+  } else if (incomingMessageJSON.msgType == "connectAddress") {
+    var ipAddress = incomingMessageJSON.ipAddress;
+    console.log("Got connect address:", ipAddress);
+
+    var url = `http://${ipAddress}:${location.port}/index.html`;
+
+    popup.show(map.getView().getCenter(), `<div id="qr-code"></div><div>${url}</div>`);
+
+    const qr = new QRCode(document.getElementById("qr-code"), {
+      text: url,
+      width: 100,
+      height: 100,
+    });
+  } else {
+    console.log("Unknown message type:", incomingMessageJSON.msgType);
   }
-
-  // Move the player marker
-  playerIconFeature.getGeometry().setCoordinates([x, z]);
-  playerIconFeature.getStyle().getImage().setRotation((gameMapNamesDict[lastGameMap].MapRotation + lastGameRot) * (Math.PI / 180));
-
-  if (shouldFollowPlayer) mapView.setCenter([x, z]);
-
-  activeRaidCounter = incomingMessageJSON.raidCounter;
 }
 
 function onOpen(evt) {
@@ -576,6 +593,35 @@ class FollowPlayerControl extends Control {
   toggleShouldFollowPlayer() {
     shouldFollowPlayer = !shouldFollowPlayer;
     // mapView.setZoom(5);
+  }
+}
+
+class QRCodeControl extends Control {
+  /**
+   * @param {Object} [opt_options] Control options.
+   */
+  constructor(opt_options) {
+    const options = opt_options || {};
+
+    const button = document.createElement('button');
+    button.innerHTML = '📲';
+
+    const element = document.createElement('div');
+    element.className = 'qr-code-button ol-unselectable ol-control';
+    element.appendChild(button);
+
+    super({
+      element: element,
+      target: options.target,
+    });
+
+    button.addEventListener('click', this.showQRCode.bind(this), false);
+  }
+
+  showQRCode() {
+    console.log("Showing QR Code");
+
+    websocket.send(JSON.stringify({type: "get_connect_address"}));
   }
 }
 
