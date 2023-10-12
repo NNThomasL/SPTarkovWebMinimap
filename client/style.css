@@ -20,18 +20,35 @@ html, body {
 .follow-player {
   top: 65px;
   left: .5em;
-  
 }
 .ol-touch .follow-player {
   top: 80px;
 }
 
 .qr-code-button {
-  top: 100px;
+  top: 110px;
   left: .5em;
 }
 .ol-touch .qr-code-button {
-  top: 115px;
+  top: 125px;
+}
+
+.follow-player button::after {
+  content: "Follow Player";
+}
+
+.qr-code-button button::after {
+  content: "QR Code";
+}
+
+@media only screen and (max-width: 600px) {
+  .follow-player button::after {
+    content: "🧭";
+  }
+
+  .qr-code-button button::after {
+    content: "QR";
+  }
 }
 
 /* Popover styling */
