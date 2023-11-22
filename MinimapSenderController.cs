@@ -1,23 +1,17 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Reflection;
-using Aki.Custom.Airdrops;
 using Aki.Reflection.Utils;
-using BepInEx.Configuration;
 using Comfort.Common;
 using EFT;
-using EFT.Airdrop;
 using EFT.Interactive;
 using EFT.Quests;
 using HarmonyLib;
 using JetBrains.Annotations;
-using MonoMod.Utils;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using TechHappy.MinimapSender;
 using UnityEngine;
-using static LocationSettingsClass;
 
 namespace TechHappy.MinimapSender
 {

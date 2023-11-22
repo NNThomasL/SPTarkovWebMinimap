@@ -1,27 +1,52 @@
-﻿using System;
+﻿using Aki.Reflection.Patching;
+using System;
 using System.Reflection;
-using Aki.Reflection.Patching;
-using UnityEngine;
 
 namespace TechHappy.MinimapSender
 {
-    public class UpdateConditionsVisibilityPatch : ModulePatch
+    public class OnConditionValueChangedPatch : ModulePatch
     {
+
         protected override MethodBase GetTargetMethod()
         {
-            return typeof(QuestClass).GetMethod("UpdateConditionsVisibility", BindingFlags.Public | BindingFlags.Instance);
+            //return RefHelper.HookRef.Create(RefTool.GetEftType(x =>
+            //        x.GetMethod("OnConditionValueChanged", BindingFlags.DeclaredOnly | RefTool.NonPublic) != null),
+            //    "OnConditionValueChanged").TargetMethod;
+
+            foreach (var type in typeof(EFT.AbstractGame).Assembly.GetTypes())
+            {
+                // type.Name.StartsWith("GClass") &&
+                // find class that is hte in-game QuestControllerClass (at least I think that is what the class is for...)
+                if (
+                  type.GetMethod("TryNotifyConditionChanged", BindingFlags.NonPublic | BindingFlags.Instance) != null &&
+                  type.BaseType == typeof(QuestControllerClass))
+                {
+                    //// set variables for later use then break from foreach after doing so
+                    //screenController = type;
+                    //ScreenControllerInstance = screenController.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static).GetValue(null);
+                    //ScreenSetFov = screenController.GetMethod("SetFov", BindingFlags.Public | BindingFlags.Instance);
+                    //break;
+
+                    return type.GetMethod("TryNotifyConditionChanged", BindingFlags.NonPublic| BindingFlags.Instance);
+                }
+            }
+
+            MinimapSenderPlugin.MinimapSenderLogger.LogError($"Unable to find class derived from QuestControllerClass with method TryNotifyConditionChanged");
+
+            return null;
         }
 
-        [PatchPrefix]
-        public static void PatchPostfix(MonoBehaviour __instance)
+        [PatchPostfix]
+        public static void PatchPostfix()
         {
             try
             {
-                //MinimapSenderPlugin.MinimapSenderLogger.LogInfo($"QuestClass -> UpdateConditionsVisibility was called!");
+                //MinimapSenderPlugin.MinimapSenderLogger.LogError($"QuestClass -> OnConditionValueChanged was called!");
 
-                //MinimapSenderPlugin.MinimapSenderLogger.LogInfo($"Quest: {__instance.ToString()}");
-
-                MinimapSenderController.Instance.UpdateQuestData();
+                if (MinimapSenderController.Instance != null)
+                {
+                    MinimapSenderController.Instance.UpdateQuestData();
+                }
             }
             catch (Exception e)
             {

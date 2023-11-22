@@ -9,51 +9,44 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BepInEx.Core" Version="5.4.21">
-			<ExcludeAssets>runtime</ExcludeAssets>
-		</PackageReference>
-	</ItemGroup>
-
-	<ItemGroup>
+		<Reference Include="0Harmony">
+		  <HintPath>N:\Games\SPT-3-7-2\BepInEx\core\0Harmony.dll</HintPath>
+		</Reference>
 		<Reference Include="aki-custom">
-		  <HintPath>dependencies\aki-custom.dll</HintPath>
+		  <HintPath>N:\Games\SPT-3-7-2\BepInEx\plugins\spt\aki-custom.dll</HintPath>
 		</Reference>
 		<Reference Include="Aki.Reflection">
-			<HintPath>..\References\EFT_Managed\Aki.Reflection.dll</HintPath>
-			<Private>False</Private>
+		  <HintPath>N:\Games\SPT-3-7-2\EscapeFromTarkov_Data\Managed\Aki.Reflection.dll</HintPath>
 		</Reference>
 		<Reference Include="Assembly-CSharp">
-			<HintPath>..\References\EFT_Managed\Assembly-CSharp.dll</HintPath>
-			<Private>False</Private>
+		  <HintPath>N:\Games\SPT-3-7-2\EscapeFromTarkov_Data\Managed\Assembly-CSharp.dll</HintPath>
+		</Reference>
+		<Reference Include="BepInEx">
+		  <HintPath>N:\Games\SPT-3-7-2\BepInEx\core\BepInEx.dll</HintPath>
 		</Reference>
 		<Reference Include="Comfort">
-			<HintPath>..\References\EFT_Managed\Comfort.dll</HintPath>
-			<Private>False</Private>
+		  <HintPath>N:\Games\SPT-3-7-2\EscapeFromTarkov_Data\Managed\Comfort.dll</HintPath>
 		</Reference>
 		<Reference Include="Comfort.Unity">
-			<HintPath>..\References\EFT_Managed\Comfort.Unity.dll</HintPath>
-			<Private>False</Private>
+		  <HintPath>N:\Games\SPT-3-7-2\EscapeFromTarkov_Data\Managed\Comfort.Unity.dll</HintPath>
 		</Reference>
 		<Reference Include="NetCoreServer">
 		  <HintPath>dependencies\NetCoreServer.dll</HintPath>
 		</Reference>
 		<Reference Include="Newtonsoft.Json">
-		  <HintPath>dependencies\Newtonsoft.Json.dll</HintPath>
+		  <HintPath>N:\Games\SPT-3-7-2\EscapeFromTarkov_Data\Managed\Newtonsoft.Json.dll</HintPath>
 		</Reference>
 		<Reference Include="System.ValueTuple">
 		  <HintPath>dependencies\System.ValueTuple.dll</HintPath>
 		</Reference>
 		<Reference Include="UnityEngine">
-			<HintPath>..\References\EFT_Managed\UnityEngine.dll</HintPath>
-			<Private>False</Private>
+		  <HintPath>N:\Games\SPT-3-7-2\EscapeFromTarkov_Data\Managed\UnityEngine.dll</HintPath>
 		</Reference>
 		<Reference Include="UnityEngine.CoreModule">
-			<HintPath>..\References\EFT_Managed\UnityEngine.CoreModule.dll</HintPath>
-			<Private>False</Private>
+		  <HintPath>N:\Games\SPT-3-7-2\EscapeFromTarkov_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
 		</Reference>
 		<Reference Include="UnityEngine.InputLegacyModule">
-			<HintPath>..\References\EFT_Managed\UnityEngine.InputLegacyModule.dll</HintPath>
-			<Private>False</Private>
+		  <HintPath>N:\Games\SPT-3-7-2\EscapeFromTarkov_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 

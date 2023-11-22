@@ -1,12 +1,11 @@
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
-using JetBrains.Annotations;
-using System.Net;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Diagnostics;
+using System.Net;
+using UnityEngine;
 
 namespace TechHappy.MinimapSender
 {
@@ -25,8 +24,6 @@ namespace TechHappy.MinimapSender
         // TODO: Move this to a better spot than a global
         internal static List<Vector3> airdrops;
 
-
-        [UsedImplicitly]
         private void Awake()
         {
             MinimapSenderLogger = Logger;
@@ -97,11 +94,6 @@ namespace TechHappy.MinimapSender
                 )
             );
 
-            // Enable patches
-            new MinimapSenderPatch().Enable();
-            new AirdropOnBoxLandPatch().Enable();
-            new UpdateConditionsVisibilityPatch().Enable();
-
             try
             {
                 // WebSocket server port
@@ -122,6 +114,21 @@ namespace TechHappy.MinimapSender
                 _server.Start();
 
                 MinimapSenderLogger.LogInfo("Done!");
+            }
+            catch (Exception e)
+            {
+                MinimapSenderLogger.LogError($"Exception {e.GetType()} occured. Message: {e.Message}. StackTrace: {e.StackTrace}");
+            }
+        }
+
+        private void Start()
+        {
+            try
+            {
+                // Enable patches
+                new MinimapSenderPatch().Enable();
+                new AirdropOnBoxLandPatch().Enable();
+                new OnConditionValueChangedPatch().Enable();
             }
             catch (Exception e)
             {
