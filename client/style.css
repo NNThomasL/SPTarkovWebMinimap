@@ -18,11 +18,11 @@ html, body {
 }
 
 .follow-player {
-  top: 65px;
+  top: 70px;
   left: .5em;
 }
 .ol-touch .follow-player {
-  top: 80px;
+  top: 85px;
 }
 
 .qr-code-button {

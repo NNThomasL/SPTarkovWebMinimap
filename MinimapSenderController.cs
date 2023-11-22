@@ -23,6 +23,7 @@ namespace TechHappy.MinimapSender
 {
     public class MinimapSenderController : MonoBehaviour
     {
+        internal static MinimapSenderController Instance;
         private MinimapSenderBroadcastService _minimapSenderService;
         //private readonly ZoneData _zoneDataHelper = ZoneData.Instance;
         private ZoneData _zoneDataHelper;
@@ -34,6 +35,8 @@ namespace TechHappy.MinimapSender
         {
             try
             {
+                Instance = this;
+
                 _zoneDataHelper = new ZoneData();
                 _localizedHelper = new LocalizedHelper();
 
@@ -121,6 +124,8 @@ namespace TechHappy.MinimapSender
         {
             try
             {
+                _questMarkerData.Clear();
+
                 Player player = GetLocalPlayerFromWorld();
 
                 var questData = Traverse.Create(player).Field("_questController").GetValue<object>();
@@ -150,10 +155,17 @@ namespace TechHappy.MinimapSender
                         Traverse.Create(item).Property("AvailableForFinishConditions").GetValue<object>();
 
                     var availableForFinishConditionsList =
-                        Traverse.Create(availableForFinishConditions).Field("list_0").GetValue<IList>();
+                        Traverse.Create(availableForFinishConditions).Field("list_0").GetValue<IList<Condition>>();
 
                     foreach (var condition in availableForFinishConditionsList)
                     {
+                        // Check if this condition of the quest has already been completed
+                        //MinimapSenderPlugin.MinimapSenderLogger.LogInfo($"Quest -> IsConditionDone: {item.IsConditionDone(condition)}");
+                        if (item.IsConditionDone(condition))
+                        {
+                            continue;
+                        }
+
                         switch (condition)
                         {
                             case ConditionLeaveItemAtLocation location:
@@ -330,6 +342,8 @@ namespace TechHappy.MinimapSender
                         }
                     }
                 }
+
+                _minimapSenderService.UpdateQuestData(_questMarkerData);
             }
             catch (Exception e)
             {

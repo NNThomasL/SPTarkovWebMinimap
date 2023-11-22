@@ -1,12 +1,6 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-using Aki.Custom.Airdrops;
+﻿using Aki.Custom.Airdrops;
 using Aki.Reflection.Patching;
-using Comfort.Common;
-using EFT;
-using EFT.Airdrop;
-using EFT.SynchronizableObjects;
+using System.Reflection;
 using UnityEngine;
 
 namespace TechHappy.MinimapSender
@@ -15,15 +9,13 @@ namespace TechHappy.MinimapSender
     {
         protected override MethodBase GetTargetMethod()
         {
-            //return typeof(AirdropPlane).GetMethod("Init", BindingFlags.Public | BindingFlags.Static);
-
             MethodInfo onBoxLandMethod = typeof(AirdropBox).GetMethod("OnBoxLand", BindingFlags.NonPublic | BindingFlags.Instance);
 
             return typeof(AirdropBox).GetMethod("OnBoxLand", BindingFlags.NonPublic | BindingFlags.Instance);
         }
 
         [PatchPostfix]
-        public static void PatchPostfix(MonoBehaviour __instance) //ref Vector3 airdropPoint
+        public static void PatchPostfix(MonoBehaviour __instance)
         {
             Vector3 airdropBoxPos = __instance.transform.position;
             MinimapSenderPlugin.MinimapSenderLogger.LogInfo($"AirdropBox OnBoxLand() was called!");

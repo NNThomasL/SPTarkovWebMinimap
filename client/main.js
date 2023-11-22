@@ -436,10 +436,21 @@ function onMessage(evt) {
     lastGamePosY = incomingMessageJSON.playerPositionY;
     lastQuests = incomingMessageJSON.quests;
 
-    if (incomingMessageJSON.quests.length === 0 && questFeatures.length > 0) {
-      // Remove the old quest icons as they might be disabled
+    if (lastQuests.length !== activeQuests.length) {
+      console.log(`lastQuests length != activeQuests length: ${lastQuests.length} vs ${activeQuests.length}`);
+      
       questFeatures.forEach(item => {
         questVectorSource.removeFeature(item);
+      });
+
+      activeQuests = lastQuests;
+
+      // Add the new ones
+      activeQuests.forEach(item => {
+        let x = calculatePolynomialValue(item.Where.x, gameMapNamesDict[lastGameMap].XCoefficients);
+        let z = calculatePolynomialValue(item.Where.z, gameMapNamesDict[lastGameMap].ZCoefficients);
+
+        addQuestIcon(x, z, item.NameText, item.DescriptionText);
       });
     }
 
