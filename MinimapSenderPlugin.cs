@@ -128,7 +128,7 @@ namespace TechHappy.MinimapSender
                 // Enable patches
                 new MinimapSenderPatch().Enable();
                 new AirdropOnBoxLandPatch().Enable();
-                new OnConditionValueChangedPatch().Enable();
+                new TryNotifyConditionChangedPatch().Enable();
             }
             catch (Exception e)
             {

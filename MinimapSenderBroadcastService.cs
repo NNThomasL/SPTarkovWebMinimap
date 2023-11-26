@@ -14,12 +14,13 @@ using Vector3 = UnityEngine.Vector3;
 
 namespace TechHappy.MinimapSender
 {
+    // This class handles the websocket server and it's events. Has a timer that sends the websocket message every interval (configured in F12 menu).
     public sealed class MinimapSenderBroadcastService : IDisposable
     {
-        private readonly GamePlayerOwner _gamePlayerOwner;
-        //private readonly QuestController _questController;
-        private readonly Timer _timer;
-        private List<QuestMarkerInfo> _quests;
+        
+        private readonly GamePlayerOwner _gamePlayerOwner; // GamePlayerOwner object that is sent from the mod's Controller object.        
+        private readonly Timer _timer; // The timer handles the sending of the map data updates over the websocket.        
+        private List<QuestMarkerInfo> _quests; // Array of quest data objects to be sent each message
         private GameWorld _gameWorld;
 
         public MinimapSenderBroadcastService(GamePlayerOwner gamePlayerOwner)
@@ -30,13 +31,14 @@ namespace TechHappy.MinimapSender
             _timer = new Timer
             {
                 AutoReset = true,
-                Interval = 250,
+                Interval = 250, // Initial value that isn't used. Configured in StartBroadcastingPosition().
             };
 
             _timer.Elapsed += (sender, args) =>
             {
                 try
                 {
+                    // Send a new map update message over the websocket.
                     SendData();
                 }
                 catch (Exception e)
@@ -53,7 +55,7 @@ namespace TechHappy.MinimapSender
 
             try
             {
-                SendData();
+                SendData(); // Send a new map update message over the websocket.
             }
             catch (Exception e)
             {
