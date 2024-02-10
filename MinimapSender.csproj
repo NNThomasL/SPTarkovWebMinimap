@@ -10,43 +10,43 @@
 
 	<ItemGroup>
 		<Reference Include="0Harmony">
-		  <HintPath>N:\Games\SPT-3-7-2\BepInEx\core\0Harmony.dll</HintPath>
+		  <HintPath>L:\Games\SPT-3-8-0-Alpha\BepInEx\core\0Harmony.dll</HintPath>
 		</Reference>
 		<Reference Include="aki-custom">
-		  <HintPath>N:\Games\SPT-3-7-2\BepInEx\plugins\spt\aki-custom.dll</HintPath>
+		  <HintPath>L:\Games\SPT-3-8-0-Alpha\BepInEx\plugins\spt\aki-custom.dll</HintPath>
 		</Reference>
 		<Reference Include="Aki.Reflection">
-		  <HintPath>N:\Games\SPT-3-7-2\EscapeFromTarkov_Data\Managed\Aki.Reflection.dll</HintPath>
+		  <HintPath>L:\Games\SPT-3-8-0-Alpha\EscapeFromTarkov_Data\Managed\Aki.Reflection.dll</HintPath>
 		</Reference>
 		<Reference Include="Assembly-CSharp">
-		  <HintPath>N:\Games\SPT-3-7-2\EscapeFromTarkov_Data\Managed\Assembly-CSharp.dll</HintPath>
+		  <HintPath>L:\Games\SPT-3-8-0-Alpha\EscapeFromTarkov_Data\Managed\Assembly-CSharp.dll</HintPath>
 		</Reference>
 		<Reference Include="BepInEx">
-		  <HintPath>N:\Games\SPT-3-7-2\BepInEx\core\BepInEx.dll</HintPath>
+		  <HintPath>L:\Games\SPT-3-8-0-Alpha\BepInEx\core\BepInEx.dll</HintPath>
 		</Reference>
 		<Reference Include="Comfort">
-		  <HintPath>N:\Games\SPT-3-7-2\EscapeFromTarkov_Data\Managed\Comfort.dll</HintPath>
+		  <HintPath>L:\Games\SPT-3-8-0-Alpha\EscapeFromTarkov_Data\Managed\Comfort.dll</HintPath>
 		</Reference>
 		<Reference Include="Comfort.Unity">
-		  <HintPath>N:\Games\SPT-3-7-2\EscapeFromTarkov_Data\Managed\Comfort.Unity.dll</HintPath>
+		  <HintPath>L:\Games\SPT-3-8-0-Alpha\EscapeFromTarkov_Data\Managed\Comfort.Unity.dll</HintPath>
 		</Reference>
 		<Reference Include="NetCoreServer">
 		  <HintPath>dependencies\NetCoreServer.dll</HintPath>
 		</Reference>
 		<Reference Include="Newtonsoft.Json">
-		  <HintPath>N:\Games\SPT-3-7-2\EscapeFromTarkov_Data\Managed\Newtonsoft.Json.dll</HintPath>
+		  <HintPath>L:\Games\SPT-3-8-0-Alpha\EscapeFromTarkov_Data\Managed\Newtonsoft.Json.dll</HintPath>
 		</Reference>
 		<Reference Include="System.ValueTuple">
 		  <HintPath>dependencies\System.ValueTuple.dll</HintPath>
 		</Reference>
 		<Reference Include="UnityEngine">
-		  <HintPath>N:\Games\SPT-3-7-2\EscapeFromTarkov_Data\Managed\UnityEngine.dll</HintPath>
+		  <HintPath>L:\Games\SPT-3-8-0-Alpha\EscapeFromTarkov_Data\Managed\UnityEngine.dll</HintPath>
 		</Reference>
 		<Reference Include="UnityEngine.CoreModule">
-		  <HintPath>N:\Games\SPT-3-7-2\EscapeFromTarkov_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+		  <HintPath>L:\Games\SPT-3-8-0-Alpha\EscapeFromTarkov_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
 		</Reference>
 		<Reference Include="UnityEngine.InputLegacyModule">
-		  <HintPath>N:\Games\SPT-3-7-2\EscapeFromTarkov_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+		  <HintPath>L:\Games\SPT-3-8-0-Alpha\EscapeFromTarkov_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 

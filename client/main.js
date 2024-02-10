@@ -34,18 +34,23 @@ let websocket;
 let extent = [0, 0, 6539, 4394];
 let viewExtent = [-200, -200, 6739, 4594];
 
+/**
+ * Sets the projection to a simple 2D pixel system.
+ */
 const customProjection = new Projection({
   code: 'xkcd-image',
   units: 'pixels',
   extent: extent,
 });
 
+/**
+ * This popup is used to display quest and cache details along with the QR code for connecting.
+ */
 const popup = new Popup();
 
 let map;
 let mapView;
 let mapOverlayImage;
-let playerMarker;
 let currentlyLoadedMap;
 let playerVectorLayer;
 let playerIconFeature;
@@ -58,18 +63,6 @@ let questFeatures = [];
 let cacheVectorLayer;
 let cacheVectorSource;
 let cacheFeatures = [];
-let questPopoverOverlay;
-let selectedFeature;
-
-// const selected = new Style({
-//   fill: new Fill({
-//     color: '#eeeeee',
-//   }),
-//   stroke: new Stroke({
-//     color: 'rgba(255, 255, 255, 0.7)',
-//     width: 2,
-//   }),
-// });
 
 const airdropIconStyle = new Style({
   image: new Icon({
@@ -78,8 +71,6 @@ const airdropIconStyle = new Style({
     anchorYUnits: 'fraction',
     src: '/images/airdrop.png',
     scale: 0.5
-    // width: 10,
-    // height: 10
   })
 });
 
@@ -90,8 +81,6 @@ const questIconStyle = new Style({
     anchorYUnits: 'fraction',
     src: '/images/check-mark.png',
     scale: 0.5
-    // width: 10,
-    // height: 10
   })
 });
 
@@ -102,13 +91,18 @@ const cacheIconStyle = new Style({
     anchorYUnits: 'fraction',
     src: '/images/convergence-target.png',
     scale: 0.5
-    // width: 10,
-    // height: 10
   })
 });
 
+/**
+ *  Toggleable setting that tells the map to snap to the moving player marker.
+ * @type {boolean}
+ */
 let shouldFollowPlayer = false;
 
+/**
+ * These variables hold the current state of the raid.
+ */
 let activeRaidCounter = 0;
 let lastGameMap = "";
 let lastGameRot = 0;
@@ -119,6 +113,10 @@ let lastAirdrops = [];
 let lastQuests = [];
 let activeQuests = [];
 
+
+/**
+ * An object that maps internal game map names to their corresponding map data.
+ */
 const gameMapNamesDict = {
   "bigmap": customs_loot_map_data, // Changed to test for now
   "TarkovStreets": streets_of_tarkov_map_data,
@@ -140,7 +138,7 @@ const gameMapNamesDict = {
 function init() {
   console.log("init() called");
 
-  // Create the map object with the interaction controls and the custom projection
+  // Create the map object with the interaction controls and the custom projection that is pixel-based.
   map = new Map({
     target: 'map',
     controls: defaultControls().extend([new FollowPlayerControl(), new QRCodeControl()]),
@@ -161,7 +159,7 @@ function init() {
     var point = event.coordinate;
 
     // This is for debugging the polynomial calculations
-    // Copy this line of text from the console and put it into the EFT Map desktop program in the "Map Creation Mode"'s map positions text box
+    // Copy this line of text from the console and put it into CactusPie's EFT Map desktop program in the "Map Creation Mode"'s map positions text box
     console.log(`${lastGamePosX} ${point[0]} ${lastGamePosZ} ${point[1]}`);
 
     // Check if there is a quest marker at the clicked location
@@ -192,7 +190,7 @@ function init() {
     popup.hide();
   });
 
-  // Player marker stuff
+  // Player marker icon
   playerIconFeature = new Feature({
     geometry: new Point([0, 0]),
   });
@@ -223,7 +221,7 @@ function init() {
 
   map.addLayer(playerVectorLayer);
 
-  // Airdrop marker stuff  
+  // Airdrop markers 
   airdropVectorSource = new VectorSource({
     features: [],
   });
@@ -236,7 +234,7 @@ function init() {
 
   map.addLayer(airdropVectorLayer);
 
-  // Quest marker stuff  
+  // Quest markers
   questVectorSource = new VectorSource({
     features: [],
   });
@@ -249,7 +247,7 @@ function init() {
 
   map.addLayer(questVectorLayer);
 
-  // Cache marker stuff  
+  // Cache markers
   cacheVectorSource = new VectorSource({
     features: [],
   });
@@ -290,6 +288,13 @@ function init() {
 }
 
 
+/**
+ * Changes the map to the specified map name.
+ * Removes the old map image, loads the new map image,
+ * and sets the view limits to the image bounds +/- 10%.
+ *
+ * @param {string} mapName - The game internal name of the map to change to.
+ */
 function changeMap(mapName) {
   console.log("Changing map to:", mapName);
 
@@ -327,22 +332,14 @@ function changeMap(mapName) {
   map.setView(mapView);
 
 
+  //TODO: Check if cache icons are even needed anymore after the cache randomization change
+  
   // Remove the old cache icons
   cacheFeatures.forEach(item => {
     cacheVectorSource.removeFeature(item);
   });
 
   cacheFeatures = [];
-
-  // Add the new ones
-  // gameMapNamesDict[mapName].caches?.forEach(item => {
-  //   let x = calculatePolynomialValue(item.x, gameMapNamesDict[mapName].XCoefficients);
-  //   let z = calculatePolynomialValue(item.z, gameMapNamesDict[mapName].ZCoefficients);
-  //   let image = item.image;
-  //   let hint = item.hint;
-
-  //   addCacheIcon(x, z, image, hint);
-  // });  
 
   currentlyLoadedMap = mapName;
 }
@@ -361,7 +358,7 @@ function addAirdropIcon(x, z) {
 
   airdropVectorSource.addFeature(newAirdropFeature);
 
-  airdropFeatures.push(newAirdropFeature);
+  airdropFeatures.push(newAirdropFeature); // Add the new marker (feature) to the array of features to keep track of it.
 }
 
 /**
@@ -383,30 +380,30 @@ function addQuestIcon(x, z, name, description) {
 
   questVectorSource.addFeature(newQuestFeature);
 
-  questFeatures.push(newQuestFeature);
+  questFeatures.push(newQuestFeature); // Add the new marker (feature) to the array of features to keep track of it.
 }
 
-/**
- * Adds a cache icon to the map at the specified coordinates.
- * @param {number} x - The x coordinate of the cache icon.
- * @param {number} z - The z coordinate of the cache icon.
- * @param {string} image - The image to use for the cache hint image.
- * @param {string} hint - The hint to display when the cache icon is clicked.
- */
-function addCacheIcon(x, z, image, hint) {
-  const newCacheFeature = new Feature({
-    geometry: new Point([x, z]),
-  });
-
-  newCacheFeature.setStyle(cacheIconStyle);
-
-  newCacheFeature.cacheImage = image;
-  newCacheFeature.cacheHint = hint;
-
-  cacheVectorSource.addFeature(newCacheFeature);
-
-  cacheFeatures.push(newCacheFeature);
-}
+// /**
+//  * Adds a cache icon to the map at the specified coordinates.
+//  * @param {number} x - The x coordinate of the cache icon.
+//  * @param {number} z - The z coordinate of the cache icon.
+//  * @param {string} image - The image to use for the cache hint image.
+//  * @param {string} hint - The hint to display when the cache icon is clicked.
+//  */
+// function addCacheIcon(x, z, image, hint) {
+//   const newCacheFeature = new Feature({
+//     geometry: new Point([x, z]),
+//   });
+//
+//   newCacheFeature.setStyle(cacheIconStyle);
+//
+//   newCacheFeature.cacheImage = image;
+//   newCacheFeature.cacheHint = hint;
+//
+//   cacheVectorSource.addFeature(newCacheFeature);
+//
+//   cacheFeatures.push(newCacheFeature);
+// }
 
 /**
  * Establishes a WebSocket connection to the SPT client mod's web server.
@@ -414,11 +411,23 @@ function addCacheIcon(x, z, image, hint) {
  * @returns {void}
  */
 function doConnect() {
-  websocket = new WebSocket("ws://" + location.host + "/")
-  websocket.onopen = function(evt) { onOpen(evt) }
-  websocket.onclose = function(evt) { onClose(evt) }
-  websocket.onmessage = function (evt) { onMessage(evt) }
-  websocket.onerror = function (evt) { onError(evt) }
+  try {
+    websocket = new WebSocket("ws://" + location.host + "/")
+    websocket.onopen = function (evt) {
+      onOpen(evt)
+    }
+    websocket.onclose = function (evt) {
+      onClose(evt)
+    }
+    websocket.onmessage = function (evt) {
+      onMessage(evt)
+    }
+    websocket.onerror = function (evt) {
+      onError(evt)
+    }
+  } catch (e) {
+    onError(e);
+  }
 }
 
 /**
@@ -428,7 +437,7 @@ function doConnect() {
 function onMessage(evt) {
   let incomingMessageJSON = JSON.parse(evt.data);
 
-  if (incomingMessageJSON.msgType == "mapData") {  
+  if (incomingMessageJSON.msgType === "mapData") {  
     lastGameMap = incomingMessageJSON.mapName;
     lastGameRot = incomingMessageJSON.playerRotationX;
     lastGamePosX = incomingMessageJSON.playerPositionX;
@@ -436,6 +445,7 @@ function onMessage(evt) {
     lastGamePosY = incomingMessageJSON.playerPositionY;
     lastQuests = incomingMessageJSON.quests;
 
+    // TODO: Make a better check for new quest info. Probably should send a request to the server for current quest state.
     if (lastQuests.length !== activeQuests.length) {
       console.log(`lastQuests length != activeQuests length: ${lastQuests.length} vs ${activeQuests.length}`);
       
@@ -456,7 +466,7 @@ function onMessage(evt) {
 
     // Quests
     // Remove the old quest icons on new raid start and create icons for the new quests
-    if (activeRaidCounter < incomingMessageJSON.raidCounter && lastGameMap != "factory4_day" && lastGameMap != "factory4_night") {
+    if (activeRaidCounter < incomingMessageJSON.raidCounter && lastGameMap !== "factory4_day" && lastGameMap !== "factory4_night") {
       // Remove the old quest icons
       questFeatures.forEach(item => {
         questVectorSource.removeFeature(item);
@@ -485,6 +495,7 @@ function onMessage(evt) {
     
     // Add the new airdop icon when a new airdrop is detected
     if (airdropFeatures.length < incomingMessageJSON.airdrops.length) {
+      // Get all new airdrops by filtering with the existing known ones
       const difference = incomingMessageJSON.airdrops.filter((element) => !airdropFeatures.includes(element));
 
       difference.forEach(airdrop => {
@@ -504,9 +515,9 @@ function onMessage(evt) {
     let x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].XCoefficients);
     let z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].ZCoefficients);
 
-    
+    // TODO: Move the multi-floor tracking to a dedicated method.
     // Special cases for maps that have multiple floors
-    if (lastGameMap == "Interchange") {
+    if (lastGameMap === "Interchange") {
       // Main mall bounding box + Goshan extension
       if ((lastGamePosX < 83 && lastGamePosX > -157.8 && lastGamePosZ < 193.2 && lastGamePosZ > -303.87) || (lastGamePosX < -157.8 && lastGamePosX > -183.4 && lastGamePosZ < 69 && lastGamePosZ > -178.66)) {
         if (lastGamePosY < 23) { // Parking garage
@@ -517,7 +528,7 @@ function onMessage(evt) {
           z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].InteriorFloor2ZCoefficients);
         }
       }
-    } else if (lastGameMap == "laboratory") {
+    } else if (lastGameMap === "laboratory") {
       if (lastGamePosY > 3) {
         x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].Floor2XCoefficients);
         z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].Floor2ZCoefficients);
@@ -525,7 +536,7 @@ function onMessage(evt) {
         x = calculatePolynomialValue(lastGamePosX, gameMapNamesDict[lastGameMap].TechnicalLevelXCoefficients);
         z = calculatePolynomialValue(lastGamePosZ, gameMapNamesDict[lastGameMap].TechnicalLevelZCoefficients);
       }
-    } else if (lastGameMap == "factory4_day" || lastGameMap == "factory4_night") {
+    } else if (lastGameMap === "factory4_day" || lastGameMap === "factory4_night") {
       // This map doesn't work
       x = 0;
       z = 0;
@@ -538,7 +549,7 @@ function onMessage(evt) {
     if (shouldFollowPlayer) mapView.setCenter([x, z]);
 
     activeRaidCounter = incomingMessageJSON.raidCounter;
-  } else if (incomingMessageJSON.msgType == "connectAddress") {
+  } else if (incomingMessageJSON.msgType === "connectAddress") {
     var ipAddress = incomingMessageJSON.ipAddress;
     console.log("Got connect address:", ipAddress);
 
@@ -562,13 +573,25 @@ function onOpen(evt) {
 
 function onClose(evt) {
   console.log("Websocket closed");
+  console.log(evt);
 }
 
 function onError(evt) {
   console.error(evt);
+  
+  popup.show(map.getView().getCenter(), `<div id="ws-error-message">Failed to connect to SPT-AKI mod.<br>Please check the LogOutput.log in your SPT BepInEx folder.</div>`);
+  
   websocket.close();
 }
 
+/**
+ * Calculates the value of a polynomial for a given x value.
+ *
+ * @param {number} x - The value of x to evaluate the polynomial.
+ * @param {number[]} coefficients - The coefficients of the polynomial. The first element is the constant term, the second
+ *                                  element is the coefficient of x, and so on.
+ * @return {number} - The result of evaluating the polynomial.
+ */
 function calculatePolynomialValue(x, coefficients) {
   let result = 0;
 
@@ -579,10 +602,10 @@ function calculatePolynomialValue(x, coefficients) {
   return result;
 }
 
+/**
+ * Represents a button control that allows the camera to follow the player marker with updates.
+ */
 class FollowPlayerControl extends Control {
-  /**
-   * @param {Object} [opt_options] Control options.
-   */
   constructor(opt_options) {
     const options = opt_options || {};
 
@@ -603,14 +626,13 @@ class FollowPlayerControl extends Control {
 
   toggleShouldFollowPlayer() {
     shouldFollowPlayer = !shouldFollowPlayer;
-    // mapView.setZoom(5);
   }
 }
 
+/**
+ * Represents a button control that shows the game client computer's connection address as a QR code.
+ */
 class QRCodeControl extends Control {
-  /**
-   * @param {Object} [opt_options] Control options.
-   */
   constructor(opt_options) {
     const options = opt_options || {};
 
@@ -632,9 +654,10 @@ class QRCodeControl extends Control {
   showQRCode() {
     console.log("Showing QR Code");
 
+    // Sends a message to the client mod requesting the computer's local IPV4 address.
     websocket.send(JSON.stringify({type: "get_connect_address"}));
   }
 }
 
-// window.addEventListener("load", init, false)
+// Start the script on load
 window.init = init;

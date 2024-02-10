@@ -4,12 +4,13 @@ using BepInEx.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
 using UnityEngine;
 
 namespace TechHappy.MinimapSender
 {
-    [BepInPlugin("com.techhappy.webminimap", "TechHappy.WebMinimap", "1.0.6")]
+    [BepInPlugin("com.techhappy.webminimap", "TechHappy.WebMinimap", "1.0.7")]
     public class MinimapSenderPlugin : BaseUnityPlugin
     {
         internal static ManualLogSource MinimapSenderLogger { get; private set; }
@@ -100,6 +101,14 @@ namespace TechHappy.MinimapSender
                 int port = DestinationPort.Value;
                 // WebSocket server content path
                 string www = "BepInEx/plugins/TechHappy-MinimapSender/www";
+                
+                // Check if mod is installed in the correct location
+                if (!Directory.Exists(www))
+                {
+                    MinimapSenderLogger.LogError(
+                        "TechHappy-MinimapSender/www folder not found. Make sure the mod is installed in the correct location!");
+                    return;
+                }
 
                 MinimapSenderLogger.LogInfo($"WebSocket server port: {port}");
                 MinimapSenderLogger.LogInfo($"WebSocket server static content path: {www}");

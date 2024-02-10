@@ -15,15 +15,20 @@ using UnityEngine;
 
 namespace TechHappy.MinimapSender
 {
+    /// <summary>
+    /// Represents a controller for sending minimap data.
+    /// </summary>
     public class MinimapSenderController : MonoBehaviour
     {
         internal static MinimapSenderController Instance;
         private MinimapSenderBroadcastService _minimapSenderService;
-        //private readonly ZoneData _zoneDataHelper = ZoneData.Instance;
         private ZoneData _zoneDataHelper;
         private LocalizedHelper _localizedHelper;
         private List<QuestMarkerInfo> _questMarkerData;
 
+        /// <summary>
+        /// This method initializes the MinimapSenderController instance, starts the broadcasting of player position, and updates the quest marker data.
+        /// </summary>
         [UsedImplicitly]
         public void Start()
         {
@@ -53,11 +58,6 @@ namespace TechHappy.MinimapSender
 
                 _minimapSenderService.UpdateQuestData(_questMarkerData);
 
-                //foreach ( var questMarkerData in _questMarkerData)
-                //{
-                //    MinimapSenderPlugin.MinimapSenderLogger.LogInfo($"QuestMarker: {_localizedHelper.Localized(questMarkerData.NameKey)} Position: {questMarkerData.Where.x}, {questMarkerData.Where.z} Neccessary: {!questMarkerData.IsNotNecessary}");
-                //}
-
                 _minimapSenderService.StartBroadcastingPosition(MinimapSenderPlugin.RefreshIntervalMilliseconds.Value);
             }
             catch (Exception e)
@@ -77,21 +77,10 @@ namespace TechHappy.MinimapSender
             _minimapSenderService?.StopBroadcastingPosition();
         }
 
-        public void Update()
-        {
-            //// TODO: Comment the code below before release
-            //if (Input.GetKeyUp(KeyCode.Backslash))
-            //{
-            //    MinimapSenderPlugin.MinimapSenderLogger.LogInfo("Backslash was pressed");
-
-            //    //_AirdropInitMethod.Invoke(Singleton<GameWorld>.Instance, [])
-
-            //    var points = LocationScene.GetAll<AirdropPoint>().Any();
-
-            //    Singleton<GameWorld>.Instance.gameObject.AddComponent<AirdropsManager>().isFlareDrop = true;
-            //}
-        }
-
+        /// <summary>
+        /// Retrieves the local player from the game world instance.
+        /// </summary>
+        /// <returns>The local player instance if it exists, otherwise null.</returns>
         private Player GetLocalPlayerFromWorld()
         {
             GameWorld gameWorld = Singleton<GameWorld>.Instance;
@@ -103,6 +92,10 @@ namespace TechHappy.MinimapSender
             return gameWorld.MainPlayer;
         }
 
+        /// <summary>
+        /// Retrieves the instance of the GameWorld.
+        /// </summary>
+        /// <returns>The GameWorld instance if it exists, otherwise null.</returns>
         private GameWorld GetGameWorld()
         {
             GameWorld gameWorld = Singleton<GameWorld>.Instance;
@@ -114,6 +107,9 @@ namespace TechHappy.MinimapSender
             return gameWorld;
         }
 
+        /// <summary>
+        /// Clears marker data, gets all quests and their conditions, and builds an array of marker data.
+        /// </summary>
         public void UpdateQuestData()
         {
             try
@@ -133,10 +129,11 @@ namespace TechHappy.MinimapSender
                 (string Id, LootItem Item)[] questItems =
                     lootItemsList.Where(x => x.Item.QuestItem).Select(x => (x.TemplateId, x)).ToArray();
 
-
-                foreach (QuestClass item in questsList)
+                foreach (var item in questsList)
                 {
-                    if (item.QuestStatus != EQuestStatus.Started)
+                    var questStatus = Traverse.Create(item).Property("QuestStatus").GetValue<EQuestStatus>();
+
+                    if (questStatus != EQuestStatus.Started)
                         continue;
 
                     var template = Traverse.Create(item).Property("Template").GetValue<object>();
@@ -151,11 +148,13 @@ namespace TechHappy.MinimapSender
                     var availableForFinishConditionsList =
                         Traverse.Create(availableForFinishConditions).Field("list_0").GetValue<IList<Condition>>();
 
+                    var flags = BindingFlags.Instance | BindingFlags.Public;
+                    var isConditionDoneMethod = item.GetType().GetMethod("IsConditionDone", flags);
+
                     foreach (var condition in availableForFinishConditionsList)
                     {
                         // Check if this condition of the quest has already been completed
-                        //MinimapSenderPlugin.MinimapSenderLogger.LogInfo($"Quest -> IsConditionDone: {item.IsConditionDone(condition)}");
-                        if (item.IsConditionDone(condition))
+                        if ((bool)isConditionDoneMethod.Invoke(item, new object[] { condition }))
                         {
                             continue;
                         }
@@ -165,8 +164,7 @@ namespace TechHappy.MinimapSender
                             case ConditionLeaveItemAtLocation location:
                                 {
                                     var zoneId = location.zoneId;
-
-
+                                    
                                     if (ZoneData.Instance.TryGetValues(zoneId,
                                             out IEnumerable<PlaceItemTrigger> triggers))
                                     {
@@ -402,8 +400,6 @@ public class ZoneData
 
 public class LocalizedHelper
 {
-    //public static readonly LocalizedHelper Instance = new LocalizedHelper();
-
     private delegate string LocalizedDelegate(string id, string prefix = null);
 
     private readonly LocalizedDelegate _refLocalized;
@@ -412,23 +408,13 @@ public class LocalizedHelper
     {
         try
         {
-            //GClass1823
-
             var flags = BindingFlags.Static | BindingFlags.Public;
 
             var type = PatchConstants.EftTypes.Single(x => x.GetMethod("ParseLocalization", flags) != null);
 
             var localizeFunc = type.GetMethod("Localized", new Type[] { typeof(string), typeof(string) });
-            //var localizeCaseFunc = type.GetMethod("Localized", new Type[] { typeof(string), typeof(EStringCase) });
-            //var transliterateFunc = type.GetMethod("Transliterate", new Type[] { typeof(string) });
 
             _refLocalized = (LocalizedDelegate)Delegate.CreateDelegate(typeof(LocalizedDelegate), null, localizeFunc);
-
-            //_refLocalized = AccessTools.MethodDelegate<Func<string, string, string>>(localizeFunc);
-
-            //_refLocalizedCase = AccessTools.MethodDelegate<Func<string, EStringCase, string>>(localizeCaseFunc);
-
-            //_refTransliterate = AccessTools.MethodDelegate<Func<string, string>>(transliterateFunc);
         }
         catch (Exception e)
         {
@@ -440,16 +426,6 @@ public class LocalizedHelper
     {
         return _refLocalized(id, prefix);
     }
-
-    //public string Localized(string id, EStringCase @case)
-    //{
-    //    return _refLocalizedCase(id, @case);
-    //}
-
-    //public string Transliterate(string text)
-    //{
-    //    return _refTransliterate(text);
-    //}
 }
 
 public struct QuestMarkerInfo

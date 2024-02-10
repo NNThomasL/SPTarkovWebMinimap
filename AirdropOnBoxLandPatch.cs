@@ -10,12 +10,13 @@ namespace TechHappy.MinimapSender
         // Getting a method that is called when an airdrop box lands. Harmony uses this method.
         protected override MethodBase GetTargetMethod()
         {
-            MethodInfo onBoxLandMethod = typeof(AirdropBox).GetMethod("OnBoxLand", BindingFlags.NonPublic | BindingFlags.Instance);
-
             return typeof(AirdropBox).GetMethod("OnBoxLand", BindingFlags.NonPublic | BindingFlags.Instance);
         }
 
-        // Adds the airdrop's position vector to the airdrops array.
+        /// <summary>
+        /// Adds the airdrop's position vector to the airdrops array after the airdrop box lands.
+        /// </summary>
+        /// <param name="__instance">The MonoBehaviour instance.</param>
         [PatchPostfix]
         public static void PatchPostfix(MonoBehaviour __instance)
         {

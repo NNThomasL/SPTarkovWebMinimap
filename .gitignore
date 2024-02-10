@@ -2,3 +2,4 @@
 bin/
 dependencies/
 obj/
+packaged/

@@ -15,9 +15,7 @@ Hit the '🧭' on the top left of the map to enable follow mode.
 
 Quest markers will show quest info on click.
 
-Here is the latest [VirusTotal scan (Release 1.0.3 of project)](https://www.virustotal.com/gui/file/ed1f80d208c53e1b4911f02423336c5b247b54396464697c90e2b9e90e26e087?nocache=1). If you are worried about security, I ask that you check and compile the code yourself. The project is pretty small so it should be a quick read and simple compile/bundle.
-
-
+If you are worried about security, I ask that you check and compile the code yourself and/or submit the zip to VirusTotal. The project is pretty small so it should be a quick read and simple compile/bundle.
 
 ## Current Status
 
@@ -30,22 +28,20 @@ Here is the latest [VirusTotal scan (Release 1.0.3 of project)](https://www.viru
 - [x] Lighthouse
 - [x] Streets Of Tarkov
 - [x] The Lab (Enhanced with floor number detection)
-- [ ] Factory - Is the map needed? Currently unable to map coordinates to image.
+- [ ] Factory - Is the map needed? Currently unable to map coordinates to image
 
 ### Features:
 - [x] Follow player button
 - [x] In-game config of port and update frequency
 - [x] Airdrop markers for when the box lands
 - [x] Quest indicators for active quests
+- [x] QR code on desktop browser for connecting mobile device
 
 ### To Do:
-- Show connect URL in in-game config section. Not sure how to do that yet...
+- Enhanced troubleshooting GUI
+- Implement a more message based communication system for the websocket
 - Shoreline Health Resort interior map
-- Possibly modify the Woods map to line up cache spots with my coordinates
-- Make it so that the index.html is not needed in the connect URL
-- Cache icons that show picture of location when clicked?
-- Button in F12 menu to open the web page
-- QR code on desktop browser for connecting mobile device
+- Create custom favicon
 
 ### Notes:
 This is my first SPTarkov mod and it is very messy. I will clean up the code in the near future but I am currently focusing on how it functions before I worry about maintenance. Silly of me but that is how I work.
