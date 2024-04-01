@@ -1,0 +1,23 @@
+{
+  "MapName": "Sandbox",
+  "MapImageFile": "ground_zero.webp",
+  "MapRotation": 0,
+  "XCoefficients": [
+    6261.426673481858,
+    -10.792852448092246
+  ],
+  "ZCoefficients": [
+    5478.3166785893,
+    -10.798650102958929
+  ],
+  "UndergroundXCoefficients": [
+    2873.6365652701643,
+    -10.97094689383093
+  ],
+  "UndergroundZCoefficients": [
+    5479.394707941099,
+    -10.880222425342021
+  ],
+  "bounds": [ 0, 0, 8000, 8000 ],
+  "initialZoom": 3
+}

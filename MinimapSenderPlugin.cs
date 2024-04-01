@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using TechHappy.MinimapSender.Patches;
 using UnityEngine;
 
 namespace TechHappy.MinimapSender
@@ -22,9 +23,11 @@ namespace TechHappy.MinimapSender
         internal static MinimapServer _server;
         internal static int raidCounter = 0;
 
-        // TODO: Move this to a better spot than a global
+        // TODO: Move these to a better spot than a global
         internal static List<Vector3> airdrops;
-
+        internal static List<QuestData> quests; // Array of quest data objects to be sent on quest data request
+        internal static long lastQuestUpdateTime = 0;
+        
         private void Awake()
         {
             MinimapSenderLogger = Logger;
@@ -135,7 +138,7 @@ namespace TechHappy.MinimapSender
             try
             {
                 // Enable patches
-                new MinimapSenderPatch().Enable();
+                new OnGameStartedPatch().Enable();
                 new AirdropOnBoxLandPatch().Enable();
                 new TryNotifyConditionChangedPatch().Enable();
             }

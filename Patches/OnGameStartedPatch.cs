@@ -3,13 +3,13 @@ using Aki.Reflection.Patching;
 using Comfort.Common;
 using EFT;
 
-namespace TechHappy.MinimapSender
+namespace TechHappy.MinimapSender.Patches
 {
     /// <summary>
     /// This class is responsible for patching the OnGameStarted method in the GameWorld class.
     /// It adds the MinimapSenderController component to the GameWorld gameObject after the original method is executed.
     /// </summary>
-    public class MinimapSenderPatch : ModulePatch
+    public class OnGameStartedPatch : ModulePatch
     {
         /// <summary>
         /// Returns the target method to be patched, which is the "OnGameStarted" method in the GameWorld class.

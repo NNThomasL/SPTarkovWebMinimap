@@ -24,7 +24,7 @@ namespace TechHappy.MinimapSender
         private MinimapSenderBroadcastService _minimapSenderService;
         private ZoneData _zoneDataHelper;
         private LocalizedHelper _localizedHelper;
-        private List<QuestMarkerInfo> _questMarkerData;
+        private List<QuestData> _questMarkerData;
 
         /// <summary>
         /// This method initializes the MinimapSenderController instance, starts the broadcasting of player position, and updates the quest marker data.
@@ -48,15 +48,19 @@ namespace TechHappy.MinimapSender
                     _minimapSenderService = new MinimapSenderBroadcastService(gamePlayerOwner);
                 }
 
-                _questMarkerData = new List<QuestMarkerInfo>();
+                _questMarkerData = new List<QuestData>();
 
-                IEnumerable<TriggerWithId> allTriggers = FindObjectsOfType<TriggerWithId>();
+                // IEnumerable<TriggerWithId> allTriggers = FindObjectsOfType<TriggerWithId>();
+                //
+                // _zoneDataHelper.AddTriggers(allTriggers);
 
-                _zoneDataHelper.AddTriggers(allTriggers);
+                // UpdateQuestData();
 
-                UpdateQuestData();
-
-                _minimapSenderService.UpdateQuestData(_questMarkerData);
+                // _minimapSenderService.UpdateQuestData(_questMarkerData);
+                
+                TriggerWithId[] triggers = ZoneDataHelper.GetAllTriggers();
+                
+                UpdateQuestData(triggers);
 
                 _minimapSenderService.StartBroadcastingPosition(MinimapSenderPlugin.RefreshIntervalMilliseconds.Value);
             }
@@ -80,7 +84,9 @@ namespace TechHappy.MinimapSender
         /// <summary>
         /// Retrieves the local player from the game world instance.
         /// </summary>
-        /// <returns>The local player instance if it exists, otherwise null.</returns>
+        /// <returns>
+        /// The Player instance if it exists, otherwise null.
+        /// </returns>
         private Player GetLocalPlayerFromWorld()
         {
             GameWorld gameWorld = Singleton<GameWorld>.Instance;
@@ -110,182 +116,211 @@ namespace TechHappy.MinimapSender
         /// <summary>
         /// Clears marker data, gets all quests and their conditions, and builds an array of marker data.
         /// </summary>
-        public void UpdateQuestData()
+        public void UpdateQuestData(TriggerWithId[] allTriggers)
         {
+            MinimapSenderPlugin.MinimapSenderLogger.LogDebug("Starting UpdateQuestData");
+            
             try
             {
-                _questMarkerData.Clear();
+                _questMarkerData = new List<QuestData>(32);
 
-                Player player = GetLocalPlayerFromWorld();
+                GameWorld gameWorld = Singleton<GameWorld>.Instance;
+                Player player = gameWorld.MainPlayer;
+                
+                // FieldInfo _questControllerQuestsField = AccessTools.Field(typeof(AbstractQuestControllerClass), "Quests");
+                // MethodInfo _getQuestMethod = AccessTools.Method(_questControllerQuestsField.FieldType, "GetQuest", new Type[] { typeof(string) });
+                
+                var questController = AccessTools.Field(typeof(Player), "_questController").GetValue(player);
+                var quests = AccessTools.Property(typeof(AbstractQuestControllerClass), "Quests")
+                    .GetValue(questController);
+                
+                if (quests == null)
+                {
+                    MinimapSenderPlugin.MinimapSenderLogger.LogError("quests is null");
+                    return;
+                }
 
-                var questData = Traverse.Create(player).Field("_questController").GetValue<object>();
+                MinimapSenderPlugin.MinimapSenderLogger.LogDebug("Getting quest list from list_1");
+                
+                var questsList = Traverse.Create(quests).Field("list_1").GetValue<List<QuestDataClass>>();
+                
+                if (questsList == null)
+                {
+                    MinimapSenderPlugin.MinimapSenderLogger.LogError("questsList is null");
+                    return;
+                }
+                
+                MinimapSenderPlugin.MinimapSenderLogger.LogDebug("Getting LootItems from list_0");
 
-                var quests = Traverse.Create(questData).Field("Quests").GetValue<object>();
-
-                var questsList = Traverse.Create(quests).Field("list_0").GetValue<IList>();
-
-                var lootItemsList = Traverse.Create(GetGameWorld()).Field("LootItems").Field("list_0").GetValue<List<LootItem>>();
+                var lootItemsList = Traverse.Create(gameWorld).Field("LootItems").Field("list_0").GetValue<List<LootItem>>();
 
                 (string Id, LootItem Item)[] questItems =
                     lootItemsList.Where(x => x.Item.QuestItem).Select(x => (x.TemplateId, x)).ToArray();
 
-                foreach (var item in questsList)
+                MinimapSenderPlugin.MinimapSenderLogger.LogDebug("Starting foreach quest in questsList");
+                
+                foreach (QuestDataClass quest in questsList)
                 {
-                    var questStatus = Traverse.Create(item).Property("QuestStatus").GetValue<EQuestStatus>();
-
-                    if (questStatus != EQuestStatus.Started)
+                    if (quest.Status != EQuestStatus.Started)
+                    {
                         continue;
-
-                    var template = Traverse.Create(item).Property("Template").GetValue<object>();
+                    }
+                    
+                    var template = Traverse.Create(quest).Field("Template").GetValue<RawQuestClass>();
+                    
+                    if (template == null)
+                    {
+                        MinimapSenderPlugin.MinimapSenderLogger.LogError("template is null");
+                        continue;
+                    }
 
                     var nameKey = Traverse.Create(template).Property("NameLocaleKey").GetValue<string>();
 
-                    var traderId = Traverse.Create(template).Field("TraderId").GetValue<string>();
+                    var traderId = Traverse.Create(template).Property("TraderId").GetValue<string>();
 
-                    var availableForFinishConditions =
-                        Traverse.Create(item).Property("AvailableForFinishConditions").GetValue<object>();
+                    var questConditions =
+                        Traverse.Create(template).Property("Conditions").GetValue<IDictionary>();
 
-                    var availableForFinishConditionsList =
-                        Traverse.Create(availableForFinishConditions).Field("list_0").GetValue<IList<Condition>>();
-
-                    var flags = BindingFlags.Instance | BindingFlags.Public;
-                    var isConditionDoneMethod = item.GetType().GetMethod("IsConditionDone", flags);
-
-                    foreach (var condition in availableForFinishConditionsList)
+                    foreach (DictionaryEntry conditionList in questConditions)
                     {
-                        // Check if this condition of the quest has already been completed
-                        if ((bool)isConditionDoneMethod.Invoke(item, new object[] { condition }))
+                        if ((EQuestStatus)conditionList.Key == EQuestStatus.AvailableForFinish)
                         {
-                            continue;
-                        }
+                            MinimapSenderPlugin.MinimapSenderLogger.LogDebug(
+                                $"Condition value type: {conditionList.Value.GetType()}");
 
-                        switch (condition)
-                        {
-                            case ConditionLeaveItemAtLocation location:
+                            var conditionsAvailable = Traverse.Create(conditionList.Value).Field("list_0").GetValue();
+
+                            foreach (Condition condition in conditionsAvailable as List<Condition>)
+                            {
+                                MinimapSenderPlugin.MinimapSenderLogger.LogDebug($"Condition: {condition}");
+
+                                // Check if this condition of the quest has already been completed
+                                //MinimapSenderPlugin.MinimapSenderLogger.LogInfo($"Quest -> IsConditionDone: {item.IsConditionDone(condition)}");
+                                if (quest.CompletedConditions.Contains(condition.id))
                                 {
-                                    var zoneId = location.zoneId;
-                                    
-                                    if (ZoneData.Instance.TryGetValues(zoneId,
-                                            out IEnumerable<PlaceItemTrigger> triggers))
-                                    {
-                                        foreach (var trigger in triggers)
-                                        {
-                                            var staticInfo = new QuestMarkerInfo
-                                            {
-                                                Id = location.id,
-                                                Where = trigger.transform.position,
-                                                ZoneId = zoneId,
-                                                Target = location.target,
-                                                NameKey = nameKey,
-                                                NameText = _localizedHelper.Localized(nameKey),
-                                                DescriptionKey = location.id,
-                                                DescriptionText = _localizedHelper.Localized(location.id),
-                                                TraderId = traderId,
-                                                TraderText = _localizedHelper.Localized(traderId),
-                                                IsNotNecessary = !location.IsNecessary,
-                                                InfoType = QuestMarkerInfo.Type.ConditionLeaveItemAtLocation
-                                            };
-
-                                            _questMarkerData.Add(staticInfo);
-                                        }
-                                    }
-
-                                    break;
+                                    continue;
                                 }
-                            case ConditionPlaceBeacon beacon:
+
+                                switch (condition)
                                 {
-                                    var zoneId = beacon.zoneId;
-
-                                    if (_zoneDataHelper.TryGetValues(zoneId,
-                                            out IEnumerable<PlaceItemTrigger> triggers))
+                                    case ConditionLeaveItemAtLocation location:
                                     {
-                                        foreach (var trigger in triggers)
+                                        string zoneId = location.zoneId;
+                                        IEnumerable<PlaceItemTrigger> zoneTriggers =
+                                            allTriggers.GetZoneTriggers<PlaceItemTrigger>(zoneId);
+
+                                        if (zoneTriggers != null)
                                         {
-                                            var staticInfo = new QuestMarkerInfo
+                                            foreach (PlaceItemTrigger trigger in zoneTriggers)
                                             {
-                                                Id = beacon.id,
-                                                Where = trigger.transform.position,
-                                                ZoneId = zoneId,
-                                                Target = beacon.target,
-                                                NameText = _localizedHelper.Localized(nameKey),
-                                                DescriptionKey = beacon.id,
-                                                DescriptionText = _localizedHelper.Localized(beacon.id),
-                                                TraderId = traderId,
-                                                TraderText = _localizedHelper.Localized(traderId),
-                                                IsNotNecessary = !beacon.IsNecessary,
-                                                InfoType = QuestMarkerInfo.Type.ConditionPlaceBeacon
-                                            };
-
-                                            _questMarkerData.Add(staticInfo);
-                                        }
-                                    }
-
-                                    break;
-                                }
-                            case ConditionFindItem findItem:
-                                {
-                                    var itemIds = findItem.target;
-
-                                    foreach (var itemId in itemIds)
-                                    {
-                                        foreach (var questItem in questItems)
-                                        {
-                                            if (questItem.Id.Equals(itemId, StringComparison.OrdinalIgnoreCase))
-                                            {
-                                                var staticInfo = new QuestMarkerInfo
+                                                var staticInfo = new QuestData
                                                 {
-                                                    Id = findItem.id,
-                                                    Where = questItem.Item.transform.position,
-                                                    Target = new[] { itemId },
+                                                    Id = location.id,
+                                                    Location = trigger.transform.position,
+                                                    ZoneId = zoneId,
                                                     NameText = _localizedHelper.Localized(nameKey),
-                                                    DescriptionKey = findItem.id,
-                                                    DescriptionText = _localizedHelper.Localized(findItem.id),
-                                                    TraderId = traderId,
-                                                    TraderText = _localizedHelper.Localized(traderId),
-                                                    IsNotNecessary = !findItem.IsNecessary,
-                                                    InfoType = QuestMarkerInfo.Type.ConditionFindItem
+                                                    Description = _localizedHelper.Localized(location.id),
+                                                    Trader = TraderIdToName(traderId),
                                                 };
 
                                                 _questMarkerData.Add(staticInfo);
                                             }
                                         }
+
+                                        break;
                                     }
-
-                                    break;
-                                }
-                            case ConditionCounterCreator counterCreator:
-                                {
-                                    var counter = Traverse.Create(counterCreator).Field("counter").GetValue<object>();
-
-                                    var conditions = Traverse.Create(counter).Property("conditions").GetValue<object>();
-
-                                    var conditionsList = Traverse.Create(conditions).Field("list_0").GetValue<IList>();
-
-                                    foreach (var condition2 in conditionsList)
+                                    case ConditionPlaceBeacon beacon:
                                     {
-                                        switch (condition2)
-                                        {
-                                            case ConditionVisitPlace place:
-                                                {
-                                                    var zoneId = place.target;
+                                        MinimapSenderPlugin.MinimapSenderLogger.LogDebug($"Beacon IsHiddenValue: {beacon.IsHiddenValue}, IsNecessary: {beacon.IsNecessary}");
+                                        
+                                        string zoneId = beacon.zoneId;
 
-                                                    if (_zoneDataHelper.TryGetValues(zoneId,
-                                                            out IEnumerable<ExperienceTrigger> triggers))
+                                        IEnumerable<PlaceItemTrigger> zoneTriggers =
+                                            allTriggers.GetZoneTriggers<PlaceItemTrigger>(zoneId);
+
+                                        if (zoneTriggers != null)
+                                        {
+                                            foreach (PlaceItemTrigger trigger in zoneTriggers)
+                                            {
+                                                var staticInfo = new QuestData
+                                                {
+                                                    Id = beacon.id,
+                                                    Location = trigger.transform.position,
+                                                    ZoneId = zoneId,
+                                                    NameText = _localizedHelper.Localized(nameKey),
+                                                    Description = _localizedHelper.Localized(beacon.id),
+                                                    Trader = TraderIdToName(traderId),
+                                                };
+
+                                                _questMarkerData.Add(staticInfo);
+                                            }
+                                        }
+
+                                        break;
+                                    }
+                                    case ConditionFindItem findItem:
+                                    {
+                                        string[] itemIds = findItem.target;
+
+                                        foreach (string itemId in itemIds)
+                                        {
+                                            foreach ((string Id, LootItem Item) questItem in questItems)
+                                            {
+                                                if (questItem.Id.Equals(itemId, StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    var staticInfo = new QuestData
                                                     {
-                                                        foreach (var trigger in triggers)
+                                                        Id = findItem.id,
+                                                        Location = questItem.Item.transform.position,
+                                                        NameText = _localizedHelper.Localized(nameKey),
+                                                        Description = _localizedHelper.Localized(findItem.id),
+                                                        Trader = TraderIdToName(traderId),
+                                                    };
+
+                                                    _questMarkerData.Add(staticInfo);
+                                                }
+                                            }
+                                        }
+
+                                        break;
+                                    }
+                                    case ConditionCounterCreator counterCreator:
+                                    {
+                                        // var counter = Traverse.Create(counterCreator).Field("counter")
+                                        //     .GetValue<object>();
+                                        //
+                                        // var conditions = Traverse.Create(counter).Property("conditions")
+                                        //     .GetValue<object>();
+                                        //
+                                        // var conditionsList = Traverse.Create(conditions).Field("list_0")
+                                        //     .GetValue<IList>();
+                                        
+                                        var conditionList2 = Traverse.Create(counterCreator.Conditions).Field("list_0").GetValue<IList>();
+
+                                        foreach (object condition2 in conditionList2)
+                                        {
+                                            switch (condition2)
+                                            {
+                                                case ConditionVisitPlace place:
+                                                {
+                                                    string zoneId = place.target;
+
+                                                    IEnumerable<ExperienceTrigger> zoneTriggers =
+                                                        allTriggers.GetZoneTriggers<ExperienceTrigger>(zoneId);
+
+                                                    if (zoneTriggers != null)
+                                                    {
+                                                        foreach (ExperienceTrigger trigger in zoneTriggers)
                                                         {
-                                                            var staticInfo = new QuestMarkerInfo
+                                                            var staticInfo = new QuestData
                                                             {
                                                                 Id = counterCreator.id,
-                                                                Where = trigger.transform.position,
+                                                                Location = trigger.transform.position,
                                                                 ZoneId = zoneId,
                                                                 NameText = _localizedHelper.Localized(nameKey),
-                                                                DescriptionKey = counterCreator.id,
-                                                                DescriptionText = _localizedHelper.Localized(counterCreator.id),
-                                                                TraderId = traderId,
-                                                                TraderText = _localizedHelper.Localized(traderId),
-                                                                IsNotNecessary = !counterCreator.IsNecessary,
-                                                                InfoType = QuestMarkerInfo.Type.ConditionVisitPlace
+                                                                Description =
+                                                                    _localizedHelper.Localized(counterCreator.id),
+                                                                Trader = TraderIdToName(traderId),
                                                             };
 
                                                             _questMarkerData.Add(staticInfo);
@@ -294,29 +329,28 @@ namespace TechHappy.MinimapSender
 
                                                     break;
                                                 }
-                                            case ConditionInZone inZone:
+                                                case ConditionInZone inZone:
                                                 {
-                                                    var zoneIds = inZone.zoneIds;
+                                                    string[] zoneIds = inZone.zoneIds;
 
-                                                    foreach (var zoneId in zoneIds)
+                                                    foreach (string zoneId in zoneIds)
                                                     {
-                                                        if (_zoneDataHelper.TryGetValues(zoneId,
-                                                                out IEnumerable<ExperienceTrigger> triggers))
+                                                        IEnumerable<ExperienceTrigger> zoneTriggers =
+                                                            allTriggers.GetZoneTriggers<ExperienceTrigger>(zoneId);
+
+                                                        if (zoneTriggers != null)
                                                         {
-                                                            foreach (var trigger in triggers)
+                                                            foreach (ExperienceTrigger trigger in zoneTriggers)
                                                             {
-                                                                var staticInfo = new QuestMarkerInfo
+                                                                var staticInfo = new QuestData
                                                                 {
                                                                     Id = counterCreator.id,
-                                                                    Where = trigger.transform.position,
+                                                                    Location = trigger.transform.position,
                                                                     ZoneId = zoneId,
                                                                     NameText = _localizedHelper.Localized(nameKey),
-                                                                    DescriptionKey = counterCreator.id,
-                                                                    DescriptionText = _localizedHelper.Localized(counterCreator.id),
-                                                                    TraderId = traderId,
-                                                                    TraderText = _localizedHelper.Localized(traderId),
-                                                                    IsNotNecessary = !counterCreator.IsNecessary,
-                                                                    InfoType = QuestMarkerInfo.Type.ConditionInZone
+                                                                    Description =
+                                                                        _localizedHelper.Localized(counterCreator.id),
+                                                                    Trader = TraderIdToName(traderId),
                                                                 };
 
                                                                 _questMarkerData.Add(staticInfo);
@@ -326,11 +360,13 @@ namespace TechHappy.MinimapSender
 
                                                     break;
                                                 }
+                                            }
                                         }
-                                    }
 
-                                    break;
+                                        break;
+                                    }
                                 }
+                            }
                         }
                     }
                 }
@@ -348,6 +384,66 @@ namespace TechHappy.MinimapSender
         {
             _minimapSenderService.Dispose();
             Destroy(this);
+        }
+        
+        private static QuestLocation ToQuestLocation(UnityEngine.Vector3 vector)
+        {
+            return new QuestLocation(vector.x, vector.y, vector.z);
+        }
+
+        private string TraderIdToName(string traderId)
+        {
+            if (traderId.Equals("5ac3b934156ae10c4430e83c", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return "Ragman";
+            }
+
+            if (traderId.Equals("54cb50c76803fa8b248b4571", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return "Prapor";
+            }
+
+            if (traderId.Equals("54cb57776803fa99248b456e", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return "Therapist";
+            }
+
+            if (traderId.Equals("579dc571d53a0658a154fbec", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return "Fence";
+            }
+
+            if (traderId.Equals("58330581ace78e27b8b10cee", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return "Skier";
+            }
+
+            if (traderId.Equals("5935c25fb3acc3127c3d8cd9", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return "Peacekeeper";
+            }
+
+            if (traderId.Equals("5a7c2eca46aef81a7ca2145d", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return "Mechanic";
+            }
+
+            if (traderId.Equals("5c0647fdd443bc2504c2d371", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return "Jaeger";
+            }
+
+            if (traderId.Equals("638f541a29ffd1183d187f57", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return "Prapor";
+            }
+
+            if (traderId.Equals("54cb50c76803fa8b248b4571", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return "Lighthouse Keeper ";
+            }
+
+            return _localizedHelper.Localized(traderId);
         }
     }
 }
@@ -428,45 +524,37 @@ public class LocalizedHelper
     }
 }
 
-public struct QuestMarkerInfo
+public struct QuestData
 {
-    public string Id;
+    public string Description { get; set; }
 
-    public Vector3 Where;
+    public string Id { get; set; }
 
-    public string ZoneId;
+    public Vector3 Location { get; set; }
 
-    public string[] Target;
+    public string NameText { get; set; }
 
-    public string NameKey;
+    public string Trader { get; set; }
 
-    public string NameText;
+    public string ZoneId { get; set; }
+}
 
-    public string DescriptionKey;
-
-    public string DescriptionText;
-
-    public string TraderId;
-
-    public string TraderText;
-
-    public int ExIndex;
-
-    public int ExIndex2;
-
-    public bool IsNotNecessary;
-
-    public Type InfoType;
-
-    public enum Type
+public class QuestLocation
+{
+    public QuestLocation()
     {
-        Airdrop,
-        Exfiltration,
-        Switch,
-        ConditionLeaveItemAtLocation,
-        ConditionPlaceBeacon,
-        ConditionFindItem,
-        ConditionVisitPlace,
-        ConditionInZone
     }
+
+    public QuestLocation(double x, double y, double z)
+    {
+        X = x;
+        Y = y;
+        Z = z;
+    }
+
+    public double X { get; set; }
+
+    public double Y { get; set; }
+
+    public double Z { get; set; }
 }

@@ -23,11 +23,11 @@ namespace TechHappy.MinimapSender
         private readonly Timer
             _timer; // The timer handles the sending of the map data updates over the websocket.        
 
-        private List<QuestMarkerInfo> _quests; // Array of quest data objects to be sent each message
-
         public MinimapSenderBroadcastService(GamePlayerOwner gamePlayerOwner)
         {
             _gamePlayerOwner = gamePlayerOwner;
+            MinimapSenderPlugin.lastQuestUpdateTime = DateTimeOffset.Now.ToUnixTimeSeconds();
+            
             _timer = new Timer
             {
                 AutoReset = true,
@@ -91,7 +91,7 @@ namespace TechHappy.MinimapSender
             {
                 if (_gamePlayerOwner.Player != null)
                 {
-                    var msg = ConstructMessage();
+                    var msg = ConstructMapDataUpdateMessage();
                     MinimapSenderPlugin._server.MulticastText(msg);
                 }
             }
@@ -102,7 +102,7 @@ namespace TechHappy.MinimapSender
             }
         }
 
-        private string ConstructMessage()
+        private string ConstructMapDataUpdateMessage()
         {
             string msgType = "mapData";
             string mapName = _gamePlayerOwner.Player.Location;
@@ -111,8 +111,7 @@ namespace TechHappy.MinimapSender
                 : new Vector3[] { };
             Vector3 playerPosition = _gamePlayerOwner.Player.Position;
             Vector2 playerRotation = _gamePlayerOwner.Player.Rotation;
-            var quests = MinimapSenderPlugin.ShowQuestMarkers.Value ? _quests : new List<QuestMarkerInfo>();
-
+            
             return JsonConvert.SerializeObject(new
             {
                 msgType = msgType,
@@ -123,13 +122,60 @@ namespace TechHappy.MinimapSender
                 playerPositionZ = playerPosition.z,
                 playerPositionY = playerPosition.y,
                 airdrops = airdrops,
-                quests = quests
+                lastQuestChangeTime = MinimapSenderPlugin.lastQuestUpdateTime
             });
         }
 
-        public void UpdateQuestData(List<QuestMarkerInfo> questData)
+        private string ConstructSettingsResponseMessage()
         {
-            _quests = questData;
+            return JsonConvert.SerializeObject(new
+            {
+                msgType = "settingsData",
+                showQuests = MinimapSenderPlugin.ShowQuestMarkers.Value,
+                showAirdrops = MinimapSenderPlugin.ShowAirdrops.Value
+            });
+        }
+
+        private string ConstructNewRaidMessage()
+        {
+            return JsonConvert.SerializeObject(new
+            {
+                msgType = "newRaid", 
+                raidCounter = MinimapSenderPlugin.raidCounter
+            });
+        }
+
+        private string ConstructAirdropMessage()
+        {
+            return JsonConvert.SerializeObject(new
+            {
+                msgType = "airdropData",
+                airdrop = MinimapSenderPlugin.airdrops.ToArray()
+            });
+        }
+
+        private string ConstructQuestDataMessage()
+        {
+            return JsonConvert.SerializeObject(new
+            {
+                msgType = "questData",
+                quests = MinimapSenderPlugin.quests.ToArray(),
+                newQuestChangeTime = MinimapSenderPlugin.lastQuestUpdateTime
+            });
+        }
+
+        private string ConstructBotPositionsMessage()
+        {
+            return JsonConvert.SerializeObject(new
+            {
+                msgType = "botPositions",
+            });
+        }
+
+        public void UpdateQuestData(List<QuestData> questData)
+        {
+            MinimapSenderPlugin.quests = questData;
+            MinimapSenderPlugin.lastQuestUpdateTime = DateTimeOffset.Now.ToUnixTimeSeconds();
         }
 
 
@@ -170,23 +216,35 @@ class WebsocketSession : WsSession
 
         var values = JsonConvert.DeserializeObject<Dictionary<string, string>>(message);
 
-        if (values["type"] != null && values["type"] == "get_connect_address")
+        if (values["type"] != null)
         {
-            var host = Dns.GetHostEntry(Dns.GetHostName());
-            foreach (var ip in host.AddressList)
+            if (values["type"] == "getConnectAddress")
             {
-                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                var host = Dns.GetHostEntry(Dns.GetHostName());
+                foreach (var ip in host.AddressList)
                 {
-                    string msgType = "connectAddress";
-
-                    MinimapSenderPlugin._server.MulticastText(JsonConvert.SerializeObject(new
+                    if (ip.AddressFamily == AddressFamily.InterNetwork)
                     {
-                        msgType = msgType,
-                        ipAddress = ip.ToString(),
-                    }));
+                        MinimapSenderPlugin._server.MulticastText(JsonConvert.SerializeObject(new
+                        {
+                            msgType = "connectAddress",
+                            ipAddress = ip.ToString(),
+                        }));
 
-                    break;
+                        break;
+                    }
                 }
+            }
+            else if (values["type"] == "getQuestData")
+            {
+                var quests = MinimapSenderPlugin.ShowQuestMarkers.Value ? MinimapSenderPlugin.quests : new List<QuestData>();
+
+                MinimapSenderPlugin._server.MulticastText(JsonConvert.SerializeObject(new
+                {
+                    msgType = "questData",
+                    quests = quests,
+                    newQuestUpdateTime = MinimapSenderPlugin.lastQuestUpdateTime
+                }));
             }
         }
     }

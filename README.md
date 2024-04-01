@@ -42,6 +42,8 @@ If you are worried about security, I ask that you check and compile the code you
 - Implement a more message based communication system for the websocket
 - Shoreline Health Resort interior map
 - Create custom favicon
+- Different quest symbols based on condition type
+- Key maps?
 
 ### Notes:
 This is my first SPTarkov mod and it is very messy. I will clean up the code in the near future but I am currently focusing on how it functions before I worry about maintenance. Silly of me but that is how I work.

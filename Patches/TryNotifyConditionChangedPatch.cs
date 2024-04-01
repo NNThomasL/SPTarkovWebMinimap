@@ -1,8 +1,10 @@
-﻿using Aki.Reflection.Patching;
-using System;
+﻿using System;
+using System.Linq;
 using System.Reflection;
+using Aki.Reflection.Patching;
+using EFT.Interactive;
 
-namespace TechHappy.MinimapSender
+namespace TechHappy.MinimapSender.Patches
 {
     /// <summary>
     /// Represents a patch that is responsible for handling the notification of quest condition changes.
@@ -17,12 +19,20 @@ namespace TechHappy.MinimapSender
         {
             foreach (var type in typeof(EFT.AbstractGame).Assembly.GetTypes())
             {
-                if (
-                  type.GetMethod("TryNotifyConditionChanged", BindingFlags.NonPublic | BindingFlags.Instance) != null &&
-                  type.BaseType == typeof(QuestControllerClass<>))
+                var method = type.GetMethod("TryNotifyConditionChanged", BindingFlags.Public | BindingFlags.Instance);
+
+                //if (method == null || method.IsAbstract || method.IsVirtual) continue;
+                
+                if (method != null && method.GetParameters()[0].Name == "quest")
                 {
-                    return type.GetMethod("TryNotifyConditionChanged", BindingFlags.NonPublic| BindingFlags.Instance);
+                    return method;
                 }
+                
+                // if (
+                //   type.GetMethod("FailConditional", BindingFlags.Public | BindingFlags.Instance) != null)
+                // {
+                //     return type.GetMethod("TryNotifyConditionChanged", BindingFlags.Public| BindingFlags.Instance);
+                // }
             }
 
             MinimapSenderPlugin.MinimapSenderLogger.LogError($"Unable to find class derived from QuestControllerClass with method TryNotifyConditionChanged");
@@ -39,9 +49,11 @@ namespace TechHappy.MinimapSender
         {
             try
             {
+                TriggerWithId[] triggers = ZoneDataHelper.GetAllTriggers();
+                
                 if (MinimapSenderController.Instance != null)
                 {
-                    MinimapSenderController.Instance.UpdateQuestData();
+                    MinimapSenderController.Instance.UpdateQuestData(triggers);
                 }
             }
             catch (Exception e)

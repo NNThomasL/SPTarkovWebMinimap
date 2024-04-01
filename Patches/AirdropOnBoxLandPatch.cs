@@ -1,9 +1,9 @@
-﻿using Aki.Custom.Airdrops;
+﻿using System.Reflection;
+using Aki.Custom.Airdrops;
 using Aki.Reflection.Patching;
-using System.Reflection;
 using UnityEngine;
 
-namespace TechHappy.MinimapSender
+namespace TechHappy.MinimapSender.Patches
 {
     public class AirdropOnBoxLandPatch : ModulePatch
     {
