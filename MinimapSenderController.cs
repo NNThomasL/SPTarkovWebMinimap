@@ -131,6 +131,7 @@ namespace TechHappy.MinimapSender
                 // MethodInfo _getQuestMethod = AccessTools.Method(_questControllerQuestsField.FieldType, "GetQuest", new Type[] { typeof(string) });
                 
                 var questController = AccessTools.Field(typeof(Player), "_questController").GetValue(player);
+                
                 var quests = AccessTools.Property(typeof(AbstractQuestControllerClass), "Quests")
                     .GetValue(questController);
                 
