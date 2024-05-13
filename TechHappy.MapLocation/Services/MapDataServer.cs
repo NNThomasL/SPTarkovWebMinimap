@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Threading.Tasks;
 using Comfort.Common;
@@ -33,6 +35,8 @@ namespace TechHappy.MapLocation.Services
         private Player _player;
 
         private WebServer _server = null;
+        
+        private int _listenPort = 0;
 
         public DateTime? LastQuestChangeTime { get; set; }
 
@@ -47,6 +51,8 @@ namespace TechHappy.MapLocation.Services
         {
             try
             {
+                _listenPort = port;
+                
                 if (_server == null)
                 {
                     var url = $"http://{ipAddress}:{port}/";
@@ -107,6 +113,7 @@ namespace TechHappy.MapLocation.Services
                 .WithModule(new CorsModule("/quests", "*"))
                 .WithModule(new ActionModule("/mapData", HttpVerbs.Get, GetMapData))
                 .WithModule(new ActionModule("/quests", HttpVerbs.Get, GetQuests))
+                .WithModule(new ActionModule("/address", HttpVerbs.Get, GetQRCodeAddress))
                 .WithModule(new FileModule("/",
                 new FileSystemProvider(combinedPath, true)));
 
@@ -170,6 +177,23 @@ namespace TechHappy.MapLocation.Services
             };
 
             return ctx.SendDataAsync(response);
+        }
+        
+        private Task GetQRCodeAddress(IHttpContext context)
+        {
+            string ipAddressToSend = "ERROR";
+            
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    ipAddressToSend = ip.ToString();
+                    break;
+                }
+            }
+
+            return context.SendDataAsync($"http://{ipAddressToSend}:{_listenPort}/?serverAddress={ipAddressToSend}&serverPort={_listenPort}");
         }
     }
 }
