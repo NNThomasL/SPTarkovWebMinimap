@@ -1,0 +1,24 @@
+﻿<UserControl x:Class="CactusPie.MapLocation.Minimap.Controls.BoundButton"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:CactusPie.MapLocation.Minimap.Controls"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid HorizontalAlignment="Stretch">
+        <Button Name="MainButton" HorizontalAlignment="Stretch" MouseRightButtonUp="MainButton_OnMouseRightButtonUp"
+                Click="MainButton_OnClick">
+        </Button>
+
+        <xctk:DoubleUpDown Name="BoundButtonDoubleUpDown" Visibility="Collapsed" HorizontalAlignment="Stretch"
+                           Minimum="-9999"
+                           Maximum="9999"
+                           FormatString="F2"
+                           ValueChanged="BoundButtonDoubleUpDown_OnValueChanged"
+                           MouseRightButtonUp="BoundButtonDoubleUpDown_OnMouseRightButtonUp"
+                           KeyDown="BoundButtonDoubleUpDown_OnKeyDown">
+        </xctk:DoubleUpDown>
+    </Grid>
+</UserControl>

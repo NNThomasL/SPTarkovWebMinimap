@@ -1,0 +1,54 @@
+﻿<Window x:Class="CactusPie.MapLocation.Minimap.Controls.AddNewBoundDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:CactusPie.MapLocation.Minimap"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        Title="Add new bound" Height="200" Width="600">
+    <Grid Background="{DynamicResource BackgroundColour}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="30" />
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" Grid.Column="0">Bound name:</Label>
+        <TextBox Name="BoundNameTextBox" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" MaxLength="64"></TextBox>
+
+        <Label Grid.Row="1" Grid.Column="0">Min X:</Label>
+        <xctk:DoubleUpDown Grid.Row="1" Grid.Column="1" Name="X1DoubleUpDown" Minimum="-10000" Maximum="10000" Increment="1"
+                           Value="1" />
+
+        <Label Grid.Row="1" Grid.Column="2">Max X:</Label>
+        <xctk:DoubleUpDown Grid.Row="1" Grid.Column="3" Name="X2DoubleUpDown" Minimum="-10000" Maximum="10000" Increment="1"
+                           Value="1" />
+
+        <Label Grid.Row="2" Grid.Column="0">Min Z:</Label>
+        <xctk:DoubleUpDown Grid.Row="2" Grid.Column="1" Name="Z1DoubleUpDown" Minimum="-10000" Maximum="10000" Increment="1"
+                           Value="1" />
+
+        <Label Grid.Row="2" Grid.Column="2">Max Z:</Label>
+        <xctk:DoubleUpDown Grid.Row="2" Grid.Column="3" Name="Z2DoubleUpDown" Minimum="-10000" Maximum="10000" Increment="1"
+                           Value="1" />
+
+        <Label Grid.Row="3" Grid.Column="0">Min Y (height):</Label>
+        <xctk:DoubleUpDown Grid.Row="3" Grid.Column="1" Name="Y1DoubleUpDown" Minimum="-10000" Maximum="10000" Increment="1"
+                           Value="1" />
+
+        <Label Grid.Row="3" Grid.Column="2">Max Y (height):</Label>
+        <xctk:DoubleUpDown Grid.Row="3" Grid.Column="3" Name="Y2DoubleUpDown" Minimum="-10000" Maximum="10000" Increment="1"
+                           Value="1" />
+
+        <Button Name="AddBoundButton" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" Click="AddBoundButton_OnClick">Add new bound</Button>
+    </Grid>
+</Window>

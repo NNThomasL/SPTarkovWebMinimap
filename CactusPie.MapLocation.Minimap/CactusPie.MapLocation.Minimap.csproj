@@ -1,0 +1,243 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net6.0-windows</TargetFramework>
+        <Nullable>enable</Nullable>
+        <UseWPF>true</UseWPF>
+        <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Update="resources\Maps\customs_map.png">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\MapCreationData\Customs.txt">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\MapCreationData\Interchange.txt">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\MapCreationData\Lighthouse.txt">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\MapCreationData\Reserve.txt">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\MapCreationData\Shoreline.txt">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\MapCreationData\Streets Of Tarkov.txt">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\MapCreationData\Woods.txt">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\Customs.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\Interchange.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\Lighthouse.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\Reserve.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\Shoreline.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\Streets Of Tarkov.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\Woods.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="appsettings.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\Labs.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\Ground Zero.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\MapCreationData\Labs.txt">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\MapCreationData\Bounds\Customs\2 Story Dorm 1F.txt">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\MapCreationData\Bounds\Customs\Office Warehouse 1F.txt">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\MapCreationData\Bounds\Interchange\Upper Level.txt">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\MapCreationData\Bounds\Interchange\Garage.txt">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\MapCreationData\Bounds\Labs\Level 2.txt">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\MapCreationData\Bounds\Labs\Technical Level.txt">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\MapCreationData\Bounds\Customs\2 Story Dorm 2F.txt">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\MapCreationData\Bounds\Customs\3 Story Dorm 1F North.txt">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\MapCreationData\Bounds\Customs\3 Story Dorm 1F South.txt">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\MapCreationData\Bounds\Customs\3 Story Dorm 2F.txt">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\MapCreationData\Bounds\Customs\3 Story Dorm 3F.txt">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Maps\MapCreationData\Bounds\Interchange\Garage Middle.txt">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="Resources\circle.png">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="Resources\circle_with_arrow.png">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="Resources\circle.png" />
+        <None Remove="Maps\Images\customs_loot_map.png" />
+        <None Remove="Maps\Images\customs_map.png" />
+        <None Remove="Maps\Images\interchange__floor2_map.png" />
+        <None Remove="Maps\Images\interchange_garage_map.png" />
+        <None Remove="Maps\Images\interchange_map.png" />
+        <None Remove="Maps\Images\lighthouse_loot_map.png" />
+        <None Remove="Maps\Images\lighthouse_map.png" />
+        <None Remove="Maps\Images\reserve_map.jpg" />
+        <None Remove="Maps\Images\reserve_map2.png" />
+        <None Remove="Maps\Images\shoreline_map.png" />
+        <None Remove="Maps\Images\streets_of_tarkov_map.png" />
+        <None Remove="Maps\Images\woods_map.png" />
+        <None Remove="Maps\Images\reserve_underground_south.png" />
+        <None Remove="Maps\Images\labs level 1.png" />
+        <None Remove="Maps\Images\labs level 2.png" />
+        <None Remove="Maps\Images\labs technical level.png" />
+        <None Remove="Maps\Images\loot level 2.png" />
+        <None Remove="Maps\Images\loot level 1.png" />
+        <None Remove="Resources\circle_blue.png" />
+        <Content Include="Resources\circle_blue.png">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="Resources\circle_brown.png" />
+        <Content Include="Resources\circle_brown.png">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="Resources\circle_purple.png" />
+        <Content Include="Resources\circle_purple.png">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="Resources\circle_yellow.png" />
+        <Content Include="Resources\circle_yellow.png">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="Resources\quest_marker.png" />
+        <Content Include="Resources\quest_marker.png">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="Maps\Images\customs.jpg" />
+        <Content Include="Maps\Images\customs.jpg">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="Maps\Images\interchange.jpg" />
+        <Content Include="Maps\Images\interchange.jpg">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="Maps\Images\labs.jpg" />
+        <Content Include="Maps\Images\labs.jpg">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="Maps\Images\lighthouse.jpg" />
+        <Content Include="Maps\Images\lighthouse.jpg">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="Maps\Images\reserve.jpg" />
+        <Content Include="Maps\Images\reserve.jpg">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="Maps\Images\shoreline.jpg" />
+        <Content Include="Maps\Images\shoreline.jpg">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="Maps\Images\streets_of_tarkov.jpg" />
+        <Content Include="Maps\Images\streets_of_tarkov.jpg">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="Maps\Images\woods.jpg" />
+        <Content Include="Maps\Images\woods.jpg">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="Maps\Images\ground_zero.jpg" />
+        <Content Include="Maps\Images\ground_zero.jpg">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="Resources\circle_orange.png" />
+        <Content Include="Resources\circle_orange.png">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="Resources\airdrop.png" />
+        <Content Include="Resources\airdrop.png">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Autofac" Version="7.1.0" />
+        <PackageReference Include="Extended.Wpf.Toolkit" Version="4.5.0" />
+        <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.4" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
+        <PackageReference Include="RestSharp" Version="110.2.0" />
+        <PackageReference Include="ScottPlot.WPF" Version="4.1.61" />
+        <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\TechHappy.MapLocation.Common\TechHappy.MapLocation.Common.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Page Update="Controls\AddNewMapDialog.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>Wpf</XamlRuntime>
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="Controls\MapControl.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>Wpf</XamlRuntime>
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="Controls\PlotWindow.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>Wpf</XamlRuntime>
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="Controls\ThemeSelector.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>Wpf</XamlRuntime>
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="Controls\AddNewBoundDialog.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>Wpf</XamlRuntime>
+            <SubType>Designer</SubType>
+        </Page>
+    </ItemGroup>
+
+</Project>

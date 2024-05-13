@@ -1,0 +1,34 @@
+{
+  "CustomBounds": [
+    {
+      "BoundName": "Parking Garage",
+      "X1": 110,
+      "X2": 45,
+      "XCoefficients": [
+        868.0240036365849,
+        -1.431571202896651
+      ],
+      "Y1": 1,
+      "Y2": 16.5,
+      "Z1": -100,
+      "Z2": 185,
+      "ZCoefficients": [
+        337.0597567877787,
+        1.4504966751337736
+      ]
+    }
+  ],
+  "MapIdentifier": "Sandbox",
+  "MapImageFile": "ground_zero.jpg",
+  "MapName": "Ground Zero",
+  "MapRotation": 0,
+  "XCoefficients": [
+    1326.3255820820616,
+    -1.4408458045666386
+  ],
+  "ZCoefficients": [
+    338.2339216744981,
+    1.4418442929331245
+  ],
+  "MarkerScale": 1
+}
