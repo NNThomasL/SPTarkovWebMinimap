@@ -1,0 +1,3 @@
+[submodule "webpage"]
+	path = webpage
+	url = https://github.com/NNThomasL/tarkov-web-map
