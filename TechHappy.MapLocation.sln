@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32616.157
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TechHappy.MapLocation", "TechHappy.MapLocation\TechHappy.MapLocation.csproj", "{9C38A2B1-5F09-49FE-AC57-9FBEF7717582}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CactusPie.MapLocation.Minimap", "CactusPie.MapLocation.Minimap\CactusPie.MapLocation.Minimap.csproj", "{267B80B2-9118-4A04-A0ED-E4153B5D3A31}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TechHappy.MapLocation.Common", "TechHappy.MapLocation.Common\TechHappy.MapLocation.Common.csproj", "{96D9FD16-E84B-425C-B97C-81CA7D1D73B1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9C38A2B1-5F09-49FE-AC57-9FBEF7717582}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C38A2B1-5F09-49FE-AC57-9FBEF7717582}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C38A2B1-5F09-49FE-AC57-9FBEF7717582}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C38A2B1-5F09-49FE-AC57-9FBEF7717582}.Release|Any CPU.Build.0 = Release|Any CPU
+		{267B80B2-9118-4A04-A0ED-E4153B5D3A31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{267B80B2-9118-4A04-A0ED-E4153B5D3A31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{267B80B2-9118-4A04-A0ED-E4153B5D3A31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{267B80B2-9118-4A04-A0ED-E4153B5D3A31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96D9FD16-E84B-425C-B97C-81CA7D1D73B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96D9FD16-E84B-425C-B97C-81CA7D1D73B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96D9FD16-E84B-425C-B97C-81CA7D1D73B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96D9FD16-E84B-425C-B97C-81CA7D1D73B1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {26F91A8D-3767-457A-821C-F66AFD620885}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+	EndGlobalSection
+EndGlobal

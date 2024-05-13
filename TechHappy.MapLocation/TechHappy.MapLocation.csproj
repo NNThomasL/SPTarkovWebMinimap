@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net472</TargetFramework>
+        <Version>2.0.5</Version>
+        <Authors>CactusPie + TechHappy</Authors>
+        <AssemblyName>TechHappy.MapLocation</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="BepInEx.Core" Version="5.4.21">
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </PackageReference>
+        <PackageReference Include="EmbedIO" Version="3.5.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="aki-custom">
+          <HintPath>..\References\aki-custom.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="Aki.Reflection">
+            <HintPath>..\References\EFT_Managed\Aki.Reflection.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="Assembly-CSharp">
+            <HintPath>..\References\EFT_Managed\Assembly-CSharp.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="Comfort">
+            <HintPath>..\References\EFT_Managed\Comfort.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="Comfort.Unity">
+            <HintPath>..\References\EFT_Managed\Comfort.Unity.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine">
+            <HintPath>..\References\EFT_Managed\UnityEngine.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.CoreModule">
+            <HintPath>..\References\EFT_Managed\UnityEngine.CoreModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.InputLegacyModule">
+            <HintPath>..\References\EFT_Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\TechHappy.MapLocation.Common\TechHappy.MapLocation.Common.csproj" />
+    </ItemGroup>
+
+</Project>

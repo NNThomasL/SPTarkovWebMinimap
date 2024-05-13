@@ -1,0 +1,15 @@
+{
+  "MapName": "Lighthouse",
+  "MapIdentifier": "lighthouse",
+  "MapImageFile": "lighthouse.jpg",
+  "MapRotation": -90,
+  "MarkerScale": 0.5,
+  "XCoefficients": [
+    1014.9585160429351,
+    -0.5722639700673324
+  ],
+  "ZCoefficients": [
+    674.7607958594614,
+    0.5649800708687204
+  ]
+}

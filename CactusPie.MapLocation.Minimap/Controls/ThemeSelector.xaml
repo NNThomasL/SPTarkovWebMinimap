@@ -1,0 +1,15 @@
+﻿<UserControl x:Class="CactusPie.MapLocation.Minimap.Controls.ThemeSelector"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:CactusPie.MapLocation.Minimap"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <ComboBox Name="ThemeComboBox" SelectedIndex="0" SelectionChanged="ThemeComboBox_OnSelectionChanged">
+        <ComboBoxItem>Light Theme</ComboBoxItem>
+        <ComboBoxItem>Dark Theme</ComboBoxItem>
+        <ComboBoxItem>Colorful Light Theme</ComboBoxItem>
+        <ComboBoxItem>Colorful Dark Theme</ComboBoxItem>
+    </ComboBox>
+</UserControl>

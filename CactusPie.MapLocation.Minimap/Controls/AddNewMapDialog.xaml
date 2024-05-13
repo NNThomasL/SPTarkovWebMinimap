@@ -1,0 +1,45 @@
+﻿<Window x:Class="CactusPie.MapLocation.Minimap.Controls.AddNewMapDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:CactusPie.MapLocation.Minimap"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        Title="Add new map" Height="200" Width="600">
+    <Grid Background="{DynamicResource BackgroundColour}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" Grid.Column="0">Map image:</Label>
+        <TextBox Name="MapImagePathTextBox" Grid.Row="0" Grid.Column="1" IsReadOnly="True"></TextBox>
+        <Button Name="AddMapImageButton" Grid.Row="0" Grid.Column="2" Click="AddMapImageButton_OnClick">Add map image</Button>
+
+        <Label Grid.Row="1" Grid.Column="0">Map name:</Label>
+        <TextBox Name="MapNameTextBox" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" MaxLength="64"></TextBox>
+
+        <Label Grid.Row="2" Grid.Column="0">Map identifier:</Label>
+        <TextBox Name="MapIdentifierTextBox" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" MaxLength="64"></TextBox>
+
+        <Label Grid.Row="3" Grid.Column="0">Map rotation:</Label>
+        <xctk:DoubleUpDown Name="MapRotationDoubleUpDown" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Minimum="-360"
+                           Maximum="360" Increment="0.5" Value="0.0" />
+
+        <Label Grid.Row="4" Grid.Column="0">Marker scale:</Label>
+        <xctk:DoubleUpDown Name="MarkerScaleDoubleUpDown" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Minimum="0.01"
+                           Maximum="5.0" Increment="0.1" Value="1.0" />
+
+        <Button Name="AddMapButton" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Click="AddMapButton_OnClick">Add map</Button>
+    </Grid>
+</Window>
