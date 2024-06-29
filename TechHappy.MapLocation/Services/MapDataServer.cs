@@ -183,15 +183,20 @@ namespace TechHappy.MapLocation.Services
         {
             string ipAddressToSend = "ERROR";
             
-            var host = Dns.GetHostEntry(Dns.GetHostName());
-            foreach (var ip in host.AddressList)
-            {
-                if (ip.AddressFamily == AddressFamily.InterNetwork)
-                {
-                    ipAddressToSend = ip.ToString();
-                    break;
-                }
-            }
+            // var host = Dns.GetHostEntry(Dns.GetHostName());
+            // foreach (var ip in host.AddressList)
+            // {
+            //     if (ip.AddressFamily == AddressFamily.InterNetwork)
+            //     {
+            //         ipAddressToSend = ip.ToString();
+            //         break;
+            //     }
+            // }
+            
+            UdpClient u = new UdpClient("google.com", 1);
+            IPAddress localAddr = ((IPEndPoint)u.Client.LocalEndPoint).Address;
+            
+            ipAddressToSend = localAddr.ToString();
 
             return context.SendDataAsync($"http://{ipAddressToSend}:{_listenPort}/?serverAddress={ipAddressToSend}&serverPort={_listenPort}");
         }

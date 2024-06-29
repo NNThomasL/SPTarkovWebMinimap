@@ -35,15 +35,20 @@ namespace TechHappy.MapLocation
             
             string ipAddressToShow = "Failed to find IPv4 address";
             
-            var host = Dns.GetHostEntry(Dns.GetHostName());
-            foreach (var ip in host.AddressList)
-            {
-                if (ip.AddressFamily == AddressFamily.InterNetwork)
-                {
-                    ipAddressToShow = ip.ToString();
-                    break;
-                }
-            }
+            // var host = Dns.GetHostEntry(Dns.GetHostName());
+            // foreach (var ip in host.AddressList)
+            // {
+            //     if (ip.AddressFamily == AddressFamily.InterNetwork)
+            //     {
+            //         ipAddressToShow = ip.ToString();
+            //         break;
+            //     }
+            // }
+            
+            UdpClient u = new UdpClient("google.com", 1);
+            IPAddress localAddr = ((IPEndPoint)u.Client.LocalEndPoint).Address;
+            
+            ipAddressToShow = localAddr.ToString();
 
             string configSection = "Local IPv4 Address: " + ipAddressToShow;
             
@@ -89,12 +94,15 @@ namespace TechHappy.MapLocation
         static void OpenMapSettingChanged(object sender, EventArgs e)
         {
             MapLocationLogger.LogInfo($"OpenMap setting changed");
+            
+            UdpClient u = new UdpClient("google.com", 1);
+            String localAddr = ((IPEndPoint)u.Client.LocalEndPoint).Address.ToString();
 
             if (OpenMapToggle.Value)
             {
                 OpenMapToggle.Value = false;
 
-                Process.Start($"http://localhost:{ListenPort.Value}/");
+                Process.Start($"http://{localAddr}:{ListenPort.Value}/?serverAddress={localAddr}&serverPort={ListenPort.Value}");
             }
         }
     }
